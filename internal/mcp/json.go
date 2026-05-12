@@ -18,12 +18,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// Package main is the mlb-mcp CLI entry point. The CLI tree lives in the
-// cmd package; the MCP server implementation lives under internal/mcp.
-package main
+package mcp
 
-import "github.com/retr0h/mlb-mcp/cmd"
+import "encoding/json"
 
-func main() {
-	cmd.Execute()
+// jsonMarshalIndent renders v as 2-space indented JSON. Used by every tool
+// handler whose canonical TextContent response is the MLB SDK's typed result —
+// preserves field names so the agent sees the same shape as the raw API.
+func jsonMarshalIndent(v any) ([]byte, error) {
+	return json.MarshalIndent(v, "", "  ")
 }

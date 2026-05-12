@@ -57,11 +57,12 @@ Desktop, add to `claude_desktop_config.json`:
 | Typed responses   | All MLB data surfaced as structured JSON via mlb-sdk      |
 | Idiomatic Go      | Functional options, context propagation, wrapped errors   |
 
-## Copyright notice
+## ⚖️ Copyright notice
 
-This package and its author are not affiliated with MLB or any MLB team.
-This server exposes MLB's public Stats API. Use of MLB data is subject to
-the notice posted at <http://gdx.mlb.com/components/copyright.txt>.
+This package and its author are not affiliated with MLB or any MLB team. This
+module is a typed Go client for MLB's public Stats API. Use of MLB data is
+subject to the notice posted at
+<http://gdx.mlb.com/components/copyright.txt>.
 
 ## License
 

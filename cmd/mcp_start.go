@@ -18,12 +18,49 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// Package main is the mlb-mcp CLI entry point. The CLI tree lives in the
-// cmd package; the MCP server implementation lives under internal/mcp.
-package main
+package cmd
 
-import "github.com/retr0h/mlb-mcp/cmd"
+import (
+	"fmt"
+	"log/slog"
+	"os/signal"
+	"syscall"
 
-func main() {
-	cmd.Execute()
+	"github.com/spf13/cobra"
+
+	mcppkg "github.com/retr0h/mlb-mcp/internal/mcp"
+)
+
+var mcpStartCmd = &cobra.Command{
+	Use:   "start",
+	Short: "Run the mlb-mcp MCP server over stdio",
+	Long: `Speaks Model Context Protocol on stdin/stdout — the transport
+agents (Claude Code, Cursor, …) expect when they spawn a server as a
+subprocess. Blocks until the agent disconnects (the typical MCP lifecycle).
+
+Logs go to stderr only — stdout is the JSON-RPC wire and writing anything
+else there would corrupt the protocol. No authentication required; MLB's
+Stats API is public.
+
+  mlb-mcp mcp start`,
+	RunE: func(cmd *cobra.Command, _ []string) error {
+		log := logger.With(slog.String("subsystem", "mcp.start"))
+		log.Info("starting")
+
+		ctx, cancel := signal.NotifyContext(
+			cmd.Context(),
+			syscall.SIGINT,
+			syscall.SIGTERM,
+		)
+		defer cancel()
+
+		s := mcppkg.New(mcppkg.Config{
+			Logger: logger,
+		})
+		var srv mcpRunner = s
+		if err := srv.Run(ctx); err != nil {
+			return fmt.Errorf("mcp start: %w", err)
+		}
+		return nil
+	},
 }
