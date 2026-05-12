@@ -99,6 +99,8 @@ typed [mlb-sdk][] Go library.
 | `recent_transactions` | Recent trades, signings, DFAs (defaults to today)              |
 | `free_agents`         | Free-agent declarations and signings for a season              |
 | `postseason_schedule` | Postseason game schedule for a season                          |
+| `player_stats`        | Player season stats (hitting, pitching, fielding) by person ID |
+| `draft`               | Draft picks by year with player, team, and school details      |
 
 ### Auto-generated raw tools (`mlb_*`)
 
@@ -108,7 +110,7 @@ pass parameters directly to `statsapi.mlb.com` and return raw JSON. When a
 new endpoint is added to mlb-sdk, regenerating picks it up automatically.
 
 <details>
-<summary>54 raw tools (click to expand)</summary>
+<summary>52 raw tools (click to expand)</summary>
 
 | Tool | Description |
 | ---- | ----------- |

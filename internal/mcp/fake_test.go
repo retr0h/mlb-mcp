@@ -42,6 +42,8 @@ type fakeDriver struct {
 	transactionsFn       func(ctx context.Context, q mlb.TransactionsQuery) (*mlb.Transactions, error)
 	freeAgentsFn         func(ctx context.Context, q mlb.FreeAgentsQuery) (*mlb.FreeAgents, error)
 	schedulePostseasonFn func(ctx context.Context, q mlb.SchedulePostseasonQuery) ([]mlb.Game, error)
+	statsFn              func(ctx context.Context, q mlb.StatsQuery) (*mlb.TeamStats, error)
+	draftFn              func(ctx context.Context, year int, q mlb.DraftQuery) (*mlb.DraftData, error)
 }
 
 func (f *fakeDriver) Schedule(ctx context.Context, q mlb.ScheduleQuery) ([]mlb.Game, error) {
@@ -143,4 +145,22 @@ func (f *fakeDriver) SchedulePostseason(
 		return f.schedulePostseasonFn(ctx, q)
 	}
 	return nil, nil
+}
+
+func (f *fakeDriver) Stats(ctx context.Context, q mlb.StatsQuery) (*mlb.TeamStats, error) {
+	if f.statsFn != nil {
+		return f.statsFn(ctx, q)
+	}
+	return &mlb.TeamStats{}, nil
+}
+
+func (f *fakeDriver) Draft(
+	ctx context.Context,
+	year int,
+	q mlb.DraftQuery,
+) (*mlb.DraftData, error) {
+	if f.draftFn != nil {
+		return f.draftFn(ctx, year, q)
+	}
+	return &mlb.DraftData{}, nil
 }

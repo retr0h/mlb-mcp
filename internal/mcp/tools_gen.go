@@ -53,10 +53,6 @@ func (s *Server) registerGeneratedTools() {
 		Name:        "mlb_get_divisions",
 	}, s.toolGetDivisions)
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
-		Description: "Returns draft data for a given year. The response wraps rounds and\npicks with rich person/team/school sub-objects.",
-		Name:        "mlb_get_draft",
-	}, s.toolGetDraft)
-	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
 		Description: "Returns schedule-like data for games modified since a given\ntimestamp. toddrob99 marks updatedSince as required.",
 		Name:        "mlb_get_game_changes",
 	}, s.toolGetGameChanges)
@@ -176,10 +172,6 @@ func (s *Server) registerGeneratedTools() {
 		Description: "All players for a sport + season",
 		Name:        "mlb_get_sports_players",
 	}, s.toolGetSportsPlayers)
-	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
-		Description: "League-wide individual stats",
-		Name:        "mlb_get_stats",
-	}, s.toolGetStats)
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
 		Description: "Returns hitting/pitching streak data. toddrob99 marks streakType,\nstreakSpan, season, sportId, and limit as all required together.\nNote: this endpoint may return 404 during the offseason.",
 		Name:        "mlb_get_stats_streaks",
@@ -616,44 +608,6 @@ func (s *Server) toolGetDivisions(ctx context.Context, _ *mcpsdk.CallToolRequest
 	}
 	if resp.StatusCode != 200 {
 		return nil, nil, fmt.Errorf("mlb_get_divisions: HTTP %d: %s", resp.StatusCode, string(body))
-	}
-	return textResult(string(body)), nil, nil
-}
-
-type getDraftArgs struct {
-	Year   int    `json:"year"`
-	Round  string `json:"round,omitempty"`
-	Fields string `json:"fields,omitempty"`
-}
-
-func (s *Server) toolGetDraft(ctx context.Context, _ *mcpsdk.CallToolRequest, args getDraftArgs) (*mcpsdk.CallToolResult, any, error) {
-	u := "https://statsapi.mlb.com/api/v1/draft/{year}"
-	u = strings.Replace(u, "{year}", fmt.Sprintf("%d", args.Year), 1)
-	qv := url.Values{}
-	if args.Round != "" {
-		qv.Set("round", args.Round)
-	}
-	if args.Fields != "" {
-		qv.Set("fields", args.Fields)
-	}
-	if len(qv) > 0 {
-		u += "?" + qv.Encode()
-	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("mlb_get_draft: %w", err)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("mlb_get_draft: %w", err)
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("mlb_get_draft: read body: %w", err)
-	}
-	if resp.StatusCode != 200 {
-		return nil, nil, fmt.Errorf("mlb_get_draft: HTTP %d: %s", resp.StatusCode, string(body))
 	}
 	return textResult(string(body)), nil, nil
 }
@@ -1854,110 +1808,6 @@ func (s *Server) toolGetSportsPlayers(ctx context.Context, _ *mcpsdk.CallToolReq
 	}
 	if resp.StatusCode != 200 {
 		return nil, nil, fmt.Errorf("mlb_get_sports_players: HTTP %d: %s", resp.StatusCode, string(body))
-	}
-	return textResult(string(body)), nil, nil
-}
-
-type getStatsArgs struct {
-	Stats      string `json:"stats"`
-	Group      string `json:"group"`
-	Season     int    `json:"season,omitempty"`
-	SportIds   string `json:"sportIds,omitempty"`
-	GameType   string `json:"gameType,omitempty"`
-	PlayerPool string `json:"playerPool,omitempty"`
-	Position   string `json:"position,omitempty"`
-	TeamId     int    `json:"teamId,omitempty"`
-	LeagueId   int    `json:"leagueId,omitempty"`
-	PersonId   int    `json:"personId,omitempty"`
-	Limit      int    `json:"limit,omitempty"`
-	Offset     int    `json:"offset,omitempty"`
-	SortStat   string `json:"sortStat,omitempty"`
-	Order      string `json:"order,omitempty"`
-	Metrics    string `json:"metrics,omitempty"`
-	StartDate  string `json:"startDate,omitempty"`
-	EndDate    string `json:"endDate,omitempty"`
-	Hydrate    string `json:"hydrate,omitempty"`
-	Fields     string `json:"fields,omitempty"`
-}
-
-func (s *Server) toolGetStats(ctx context.Context, _ *mcpsdk.CallToolRequest, args getStatsArgs) (*mcpsdk.CallToolResult, any, error) {
-	u := "https://statsapi.mlb.com/api/v1/stats"
-	qv := url.Values{}
-	if args.Stats != "" {
-		qv.Set("stats", args.Stats)
-	}
-	if args.Group != "" {
-		qv.Set("group", args.Group)
-	}
-	if args.Season != 0 {
-		qv.Set("season", fmt.Sprintf("%d", args.Season))
-	}
-	if args.SportIds != "" {
-		qv.Set("sportIds", args.SportIds)
-	}
-	if args.GameType != "" {
-		qv.Set("gameType", args.GameType)
-	}
-	if args.PlayerPool != "" {
-		qv.Set("playerPool", args.PlayerPool)
-	}
-	if args.Position != "" {
-		qv.Set("position", args.Position)
-	}
-	if args.TeamId != 0 {
-		qv.Set("teamId", fmt.Sprintf("%d", args.TeamId))
-	}
-	if args.LeagueId != 0 {
-		qv.Set("leagueId", fmt.Sprintf("%d", args.LeagueId))
-	}
-	if args.PersonId != 0 {
-		qv.Set("personId", fmt.Sprintf("%d", args.PersonId))
-	}
-	if args.Limit != 0 {
-		qv.Set("limit", fmt.Sprintf("%d", args.Limit))
-	}
-	if args.Offset != 0 {
-		qv.Set("offset", fmt.Sprintf("%d", args.Offset))
-	}
-	if args.SortStat != "" {
-		qv.Set("sortStat", args.SortStat)
-	}
-	if args.Order != "" {
-		qv.Set("order", args.Order)
-	}
-	if args.Metrics != "" {
-		qv.Set("metrics", args.Metrics)
-	}
-	if args.StartDate != "" {
-		qv.Set("startDate", args.StartDate)
-	}
-	if args.EndDate != "" {
-		qv.Set("endDate", args.EndDate)
-	}
-	if args.Hydrate != "" {
-		qv.Set("hydrate", args.Hydrate)
-	}
-	if args.Fields != "" {
-		qv.Set("fields", args.Fields)
-	}
-	if len(qv) > 0 {
-		u += "?" + qv.Encode()
-	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("mlb_get_stats: %w", err)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("mlb_get_stats: %w", err)
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("mlb_get_stats: read body: %w", err)
-	}
-	if resp.StatusCode != 200 {
-		return nil, nil, fmt.Errorf("mlb_get_stats: HTTP %d: %s", resp.StatusCode, string(body))
 	}
 	return textResult(string(body)), nil, nil
 }

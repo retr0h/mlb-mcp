@@ -137,7 +137,6 @@ func TestServer_ListTools(t *testing.T) {
 		"mlb_get_conferences",
 		"mlb_get_context_metrics",
 		"mlb_get_divisions",
-		"mlb_get_draft",
 		"mlb_get_game_changes",
 		"mlb_get_game_color",
 		"mlb_get_game_color_diff",
@@ -168,7 +167,6 @@ func TestServer_ListTools(t *testing.T) {
 		"mlb_get_seasons",
 		"mlb_get_sports",
 		"mlb_get_sports_players",
-		"mlb_get_stats",
 		"mlb_get_stats_streaks",
 		"mlb_get_team_alumni",
 		"mlb_get_team_coaches",
@@ -199,6 +197,8 @@ func TestServer_ListTools(t *testing.T) {
 		"recent_transactions",
 		"free_agents",
 		"postseason_schedule",
+		"player_stats",
+		"draft",
 	)
 	want = append(want, rawTools...)
 

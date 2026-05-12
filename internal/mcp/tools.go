@@ -121,6 +121,22 @@ func (s *Server) registerTools() {
 			"the current year.",
 	}, s.toolPostseasonSchedule)
 
+	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
+		Name: "player_stats",
+		Description: "Use this when the user asks about a player's stats — 'what are Ohtani's " +
+			"stats', 'how is Trout hitting', 'what's Judge's batting average this year'. " +
+			"Returns season stats for a player by person ID. Supports hitting, pitching, " +
+			"and fielding stat groups. Season defaults to the current year.",
+	}, s.toolPlayerStats)
+
+	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
+		Name: "draft",
+		Description: "Use this when the user asks about the MLB draft — 'who did the Dodgers " +
+			"draft', 'who was the #1 pick in 2024', 'show me the first round'. Returns draft " +
+			"picks with player info, team, school, and pick details. Year defaults to the " +
+			"current year. Optionally filter by round.",
+	}, s.toolDraft)
+
 	s.registerGeneratedTools()
 }
 
@@ -172,6 +188,17 @@ type recentTransactionsArgs struct {
 
 type freeAgentsArgs struct {
 	Season int `json:"season,omitempty" jsonschema:"Season year, e.g. 2026. Defaults to the current year."`
+}
+
+type playerStatsArgs struct {
+	PersonID int    `json:"person_id"        jsonschema:"MLB person ID (required), e.g. 660271 for Shohei Ohtani."`
+	Group    string `json:"group,omitempty"  jsonschema:"Stat group: 'hitting', 'pitching', or 'fielding'. Defaults to 'hitting'."`
+	Season   int    `json:"season,omitempty" jsonschema:"Season year. Defaults to the current year."`
+}
+
+type draftArgs struct {
+	Year  int    `json:"year,omitempty"  jsonschema:"Draft year. Defaults to the current year."`
+	Round string `json:"round,omitempty" jsonschema:"Filter to a specific round, e.g. '1' for the first round."`
 }
 
 type postseasonScheduleArgs struct {
@@ -436,4 +463,53 @@ func jsonOrErr(v any) string {
 		return "error: marshal response: " + err.Error()
 	}
 	return string(b)
+}
+
+func (s *Server) toolPlayerStats(
+	ctx context.Context,
+	_ *mcpsdk.CallToolRequest,
+	args playerStatsArgs,
+) (*mcpsdk.CallToolResult, any, error) {
+	if args.PersonID == 0 {
+		return nil, nil, fmt.Errorf("mlb-mcp: player_stats: person_id is required")
+	}
+	group := args.Group
+	if group == "" {
+		group = "hitting"
+	}
+	season := args.Season
+	if season == 0 {
+		season = time.Now().Year()
+	}
+	stats, err := s.client.Stats(ctx, mlb.StatsQuery{
+		Stats:    "season",
+		Group:    group,
+		PersonID: args.PersonID,
+		Season:   season,
+		SportIDs: "1",
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("mlb-mcp: player_stats: %w", err)
+	}
+	return textResult(jsonOrErr(stats)), nil, nil
+}
+
+func (s *Server) toolDraft(
+	ctx context.Context,
+	_ *mcpsdk.CallToolRequest,
+	args draftArgs,
+) (*mcpsdk.CallToolResult, any, error) {
+	year := args.Year
+	if year == 0 {
+		year = time.Now().Year()
+	}
+	q := mlb.DraftQuery{}
+	if args.Round != "" {
+		q.Round = args.Round
+	}
+	draft, err := s.client.Draft(ctx, year, q)
+	if err != nil {
+		return nil, nil, fmt.Errorf("mlb-mcp: draft: %w", err)
+	}
+	return textResult(jsonOrErr(draft)), nil, nil
 }

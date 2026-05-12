@@ -46,6 +46,8 @@ var composedOps = map[string]bool{
 	"getTransactions":       true,
 	"getStatsLeaders":       true,
 	"getSchedulePostseason": true,
+	"getStats":              true,
+	"getDraft":              true,
 }
 
 func main() {

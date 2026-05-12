@@ -136,6 +136,8 @@ and return clean, structured JSON from the typed Go SDK.
 - recent_transactions — recent signings, trades, DFAs; defaults to today
 - free_agents         — free-agent declarations and signings for a season
 - postseason_schedule — postseason game schedule for a season
+- player_stats        — player season stats by person ID
+- draft               — draft picks by year
 
 ## Tier 2 — Raw spec tools (mlb_* prefix)
 

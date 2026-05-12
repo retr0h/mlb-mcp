@@ -68,4 +68,10 @@ type Driver interface {
 
 	// SchedulePostseason fetches the postseason schedule.
 	SchedulePostseason(ctx context.Context, q mlb.SchedulePostseasonQuery) ([]mlb.Game, error)
+
+	// Stats fetches individual player stats (season, career, etc.).
+	Stats(ctx context.Context, q mlb.StatsQuery) (*mlb.TeamStats, error)
+
+	// Draft fetches draft data for a given year.
+	Draft(ctx context.Context, year int, q mlb.DraftQuery) (*mlb.DraftData, error)
 }
