@@ -58,7 +58,7 @@ method.
    handler, not in the LLM's reasoning.
 4. **Return complete answers.** Format results so the LLM can relay
    them directly — don't return raw IDs that need a follow-up lookup.
-5. **Name tools as user intents.** `today_scores` not `get_schedule`.
+5. **Name tools as user intents.** `scores` not `get_schedule`.
    `player_bio` not `get_person`. The name tells the LLM when to
    pick it.
 
