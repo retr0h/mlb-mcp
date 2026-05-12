@@ -116,23 +116,36 @@ func (s *Server) Run(ctx context.Context) error {
 // what the server can do without paging through every tool's description.
 const instructions = `mlb-mcp — MLB Stats API over MCP.
 
-This server exposes MLB's public Stats API as composable, intent-focused
-tools. Each tool answers one user question directly. No authentication is
-required; all data is publicly available.
+This server exposes MLB's public Stats API through two tiers of tools. No
+authentication is required; all data is publicly available.
 
-## Tools at a glance
+## Tier 1 — Composed tools (prefer these)
+
+These tools are hand-written, intent-focused wrappers that answer common
+questions directly. They accept friendly arguments (dates, league names, etc.)
+and return clean, structured JSON from the typed Go SDK.
 
 - scores              — scores and results for any date (defaults to today)
-- standings          — division standings for AL, NL, or both leagues
-- player_bio         — biographical info for a player by MLB person ID
-- team_info          — rich team metadata (venue, league, division) by team ID
-- team_roster        — active roster for a team by team ID
-- league_leaders     — top players in a stat category (HR, AVG, ERA, …)
-- game_detail        — boxscore (team batting/pitching stats) for a gamePk
-- game_linescore     — inning-by-inning line for a gamePk
+- standings           — division standings for AL, NL, or both leagues
+- player_bio          — biographical info for a player by MLB person ID
+- team_info           — rich team metadata (venue, league, division) by team ID
+- team_roster         — active roster for a team by team ID
+- league_leaders      — top players in a stat category (HR, AVG, ERA, …)
+- game_detail         — boxscore (team batting/pitching stats) for a gamePk
+- game_linescore      — inning-by-inning line for a gamePk
 - recent_transactions — recent signings, trades, DFAs; defaults to today
-- free_agents        — free-agent declarations and signings for a season
+- free_agents         — free-agent declarations and signings for a season
 - postseason_schedule — postseason game schedule for a season
+
+## Tier 2 — Raw spec tools (mlb_* prefix)
+
+Every other endpoint from the MLB Stats API OpenAPI spec is registered as a
+raw mlb_<operation> tool. These tools pass parameters directly to
+statsapi.mlb.com and return the unprocessed JSON response. Use them when a
+composed tool does not cover what you need.
+
+Examples: mlb_get_boxscore, mlb_get_live_feed, mlb_get_draft,
+mlb_get_team_stats, mlb_get_seasons, mlb_get_venue, and many more.
 
 ## Key concepts
 
@@ -140,7 +153,7 @@ required; all data is publicly available.
   147 = New York Yankees, 111 = Boston Red Sox).
 - Person IDs: use MLB's canonical numeric player IDs (e.g. 660271 = Shohei Ohtani).
 - Game PKs: the unique game identifier returned by scores and
-  postseason_schedule; used by game_detail and game_linescore.
+  postseason_schedule; used by game_detail, game_linescore, and raw tools.
 - Stat categories for league_leaders: 'homeRuns', 'battingAverage',
   'strikeOuts', 'era', 'wins', 'saves', 'rbi', 'stolenBases'.
 - Season: all season-bearing tools default to the current year when omitted.`

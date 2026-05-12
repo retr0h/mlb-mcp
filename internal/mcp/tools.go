@@ -120,6 +120,8 @@ func (s *Server) registerTools() {
 			"Returns all postseason games with teams, scores, and status. Season defaults to " +
 			"the current year.",
 	}, s.toolPostseasonSchedule)
+
+	s.registerSpecTools()
 }
 
 // --- args structs ---

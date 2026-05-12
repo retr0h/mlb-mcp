@@ -106,6 +106,10 @@ func TestJsonOrErr_MarshalError(t *testing.T) {
 // TestServer_ListTools verifies every expected tool name is registered and
 // that no extra tools have been silently added. Treat the catalog as a frozen
 // surface — accidental removal or addition trips this test.
+//
+// The server exposes two tiers:
+//   - Tier 1: 11 hand-written composed tools (friendly names).
+//   - Tier 2: 54 auto-generated raw spec tools (mlb_* prefix).
 func TestServer_ListTools(t *testing.T) {
 	cs := mcpServerHarness(t, &fakeDriver{})
 
@@ -122,7 +126,68 @@ func TestServer_ListTools(t *testing.T) {
 		got[tool.Name] = true
 	}
 
-	want := []string{
+	// Tier 2 — raw spec tools auto-generated from the OpenAPI spec.
+	rawTools := []string{
+		"mlb_get_all_seasons",
+		"mlb_get_all_star_ballot",
+		"mlb_get_all_star_final_vote",
+		"mlb_get_all_star_write_ins",
+		"mlb_get_attendance",
+		"mlb_get_award_recipients",
+		"mlb_get_conferences",
+		"mlb_get_context_metrics",
+		"mlb_get_divisions",
+		"mlb_get_draft",
+		"mlb_get_game_changes",
+		"mlb_get_game_color",
+		"mlb_get_game_color_diff",
+		"mlb_get_game_color_timestamps",
+		"mlb_get_game_content",
+		"mlb_get_game_diff",
+		"mlb_get_game_pace",
+		"mlb_get_game_timestamps",
+		"mlb_get_game_uniforms",
+		"mlb_get_game_win_probability",
+		"mlb_get_high_low",
+		"mlb_get_home_run_derby",
+		"mlb_get_jobs",
+		"mlb_get_jobs_datacasters",
+		"mlb_get_jobs_official_scorers",
+		"mlb_get_jobs_umpires",
+		"mlb_get_leagues",
+		"mlb_get_live_feed",
+		"mlb_get_meta",
+		"mlb_get_people",
+		"mlb_get_people_changes",
+		"mlb_get_person_game_stats",
+		"mlb_get_play_by_play",
+		"mlb_get_schedule_postseason_series",
+		"mlb_get_schedule_postseason_tune_in",
+		"mlb_get_schedule_tied",
+		"mlb_get_season",
+		"mlb_get_seasons",
+		"mlb_get_sports",
+		"mlb_get_sports_players",
+		"mlb_get_stats",
+		"mlb_get_stats_streaks",
+		"mlb_get_team_alumni",
+		"mlb_get_team_coaches",
+		"mlb_get_team_leaders",
+		"mlb_get_team_personnel",
+		"mlb_get_team_stats",
+		"mlb_get_team_uniforms",
+		"mlb_get_teams",
+		"mlb_get_teams_affiliates",
+		"mlb_get_teams_history",
+		"mlb_get_teams_stats",
+		"mlb_get_umpire_games",
+		"mlb_get_venue",
+	}
+
+	// Tier 1 — composed tools.
+	want := make([]string, 0, 11+len(rawTools))
+	want = append(
+		want,
 		"scores",
 		"standings",
 		"player_bio",
@@ -134,7 +199,9 @@ func TestServer_ListTools(t *testing.T) {
 		"recent_transactions",
 		"free_agents",
 		"postseason_schedule",
-	}
+	)
+	want = append(want, rawTools...)
+
 	for _, name := range want {
 		if !got[name] {
 			t.Errorf("expected tool %q not registered", name)
