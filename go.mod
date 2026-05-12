@@ -3,6 +3,7 @@ module github.com/retr0h/mlb-mcp
 go 1.25.7
 
 require (
+	github.com/dave/jennifer v1.7.1
 	github.com/getkin/kin-openapi v0.135.0
 	github.com/lmittmann/tint v1.1.3
 	github.com/modelcontextprotocol/go-sdk v1.6.0
@@ -249,6 +250,7 @@ replace github.com/retr0h/mlb-sdk => ../mlb-sdk
 
 tool (
 	github.com/golangci/golangci-lint/v2/cmd/golangci-lint
+	github.com/retr0h/mlb-mcp/internal/mcp/mcpgen
 	github.com/segmentio/golines
 	mvdan.cc/gofumpt
 )

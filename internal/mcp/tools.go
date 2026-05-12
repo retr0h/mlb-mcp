@@ -121,7 +121,7 @@ func (s *Server) registerTools() {
 			"the current year.",
 	}, s.toolPostseasonSchedule)
 
-	s.registerSpecTools()
+	s.registerGeneratedTools()
 }
 
 // --- args structs ---
