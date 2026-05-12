@@ -56,11 +56,13 @@ just ready          # fmt + vet + lint
 
 ## Adding a new tool
 
-An MCP tool answers a **user intent** in one call — not a bare SDK method. See
-`AGENTS.md § Tool design` for the design rules. Each tool calls 1–3 SDK methods
-internally and returns a complete answer.
+There are two kinds of tools. Pick the right workflow:
 
-When adding a new tool, touch every one of these in order:
+### Adding a composed tool (hand-written, intent-focused)
+
+A composed tool answers a **user intent** in one call — not a bare SDK method.
+See `AGENTS.md § Tool design` for the design rules. Each tool calls 1–3 SDK
+methods internally and returns a complete answer.
 
 1. **`internal/mcp/session.go`** — if the tool needs an SDK method not yet on
    the `Driver` interface, add it. The concrete `*mlb.Client` must already
@@ -68,14 +70,33 @@ When adding a new tool, touch every one of these in order:
 2. **`internal/mcp/tools.go`** — register the tool via `mcpsdk.AddTool` in
    `registerTools()`. Write the args struct (with `json` + `jsonschema` tags)
    and handler func. Wrap errors as `fmt.Errorf("mlb-mcp: <tool>: %w", err)`.
-3. **`internal/mcp/tools_test.go`** — one table-driven test per handler,
-   covering: happy path, empty/missing required args, SDK error propagation. Use
-   a fake `Driver` implementation. Coverage must stay at 100.0%.
+3. **`internal/mcp/server_test.go`** — add rows to `TestServer_CallTool` for the
+   new tool: happy path, missing required args, SDK error propagation. Use the
+   `fakeDriver`. Coverage must stay at 100.0%.
 4. **`internal/mcp/server.go`** — update the `instructions` const to mention the
-   new tool.
-5. **`README.md`** — add a row to the `## Tools` table.
-6. **`just ready`** — final gate. fmt + vet + lint + 100% coverage all green
+   new tool under Tier 1.
+5. **`internal/mcp/mcpgen/main.go`** — add the tool's `operationId` to
+   `composedOps` so the generator skips it.
+6. **`README.md`** — add a row to the **Composed tools** table.
+7. **`go generate ./internal/mcp/`** — regenerate `tools_gen.go` so the raw tool
+   is removed (now covered by the composed version).
+8. **`just ready`** — final gate. fmt + vet + lint + 100% coverage all green
    before committing.
+
+### Adding a raw tool (auto-generated from OpenAPI spec)
+
+When a new endpoint is added to [mlb-sdk][]'s OpenAPI spec, run:
+
+```bash
+go generate ./internal/mcp/
+```
+
+The `mcpgen` tool reads the embedded spec from `mlb-sdk/pkg/api`, generates
+typed args structs and HTTP handlers for every non-composed operation, and
+writes `internal/mcp/tools_gen.go`. Update the raw tools table in `README.md` to
+match.
+
+[mlb-sdk]: https://github.com/retr0h/mlb-sdk
 
 ## Public surface authoring
 

@@ -32,7 +32,7 @@ mlb-mcp mcp start
 
 ### Claude Code
 
-This repo ships a `.claude/mcp.json` that Claude Code auto-discovers when
+This repo ships a `.mcp.json` that Claude Code auto-discovers when
 your working directory is the repo root. Clone and open:
 
 ```bash
@@ -59,14 +59,23 @@ Add to `claude_desktop_config.json`:
 ### Other MCP clients
 
 Any client that supports stdio transport can launch `mlb-mcp mcp start` as
-a subprocess. See [`.claude/mcp.json`](.claude/mcp.json) for the canonical
+a subprocess. See [`.mcp.json`](.mcp.json) for the canonical
 config.
 
 ## Tools
 
+The server exposes **65 tools** in two tiers. Prefer the composed tools for
+common questions; the raw tools cover everything else.
+
+### Composed tools
+
+Hand-written, intent-focused wrappers that answer common questions directly.
+They accept friendly arguments and return clean, structured JSON from the
+typed [mlb-sdk][] Go library.
+
 | Tool                  | Description                                                    |
 | --------------------- | -------------------------------------------------------------- |
-| `today_scores`        | Today's scores and game status across MLB                      |
+| `scores`              | Scores and results for any date (defaults to today)            |
 | `standings`           | Division standings for AL, NL, or both leagues                 |
 | `player_bio`          | Player biographical info by MLB person ID                      |
 | `team_info`           | Team metadata (venue, league, division) by team ID             |
@@ -77,6 +86,75 @@ config.
 | `recent_transactions` | Recent trades, signings, DFAs (defaults to today)              |
 | `free_agents`         | Free-agent declarations and signings for a season              |
 | `postseason_schedule` | Postseason game schedule for a season                          |
+
+### Auto-generated raw tools (`mlb_*`)
+
+Every other endpoint from the [mlb-sdk][] OpenAPI spec is auto-generated at
+build time by `mcpgen` (run via `go generate ./internal/mcp/`). These tools
+pass parameters directly to `statsapi.mlb.com` and return raw JSON. When a
+new endpoint is added to mlb-sdk, regenerating picks it up automatically.
+
+<details>
+<summary>54 raw tools (click to expand)</summary>
+
+| Tool | Description |
+| ---- | ----------- |
+| `mlb_get_all_seasons` | All historical seasons |
+| `mlb_get_all_star_ballot` | All-Star ballot |
+| `mlb_get_all_star_final_vote` | All-Star final vote |
+| `mlb_get_all_star_write_ins` | All-Star write-ins |
+| `mlb_get_attendance` | Attendance records |
+| `mlb_get_award_recipients` | Award recipients (MVP, HOF, ...) |
+| `mlb_get_conferences` | Conferences |
+| `mlb_get_context_metrics` | Win probability for a game |
+| `mlb_get_divisions` | Divisions |
+| `mlb_get_draft` | Draft picks by year |
+| `mlb_get_game_changes` | Recently changed games |
+| `mlb_get_game_color` | Color commentary feed |
+| `mlb_get_game_color_diff` | Color feed diff patch |
+| `mlb_get_game_color_timestamps` | Color feed timestamps |
+| `mlb_get_game_content` | Game highlights and editorial |
+| `mlb_get_game_diff` | Live feed diff patch |
+| `mlb_get_game_pace` | Pace-of-play stats |
+| `mlb_get_game_timestamps` | Live feed timestamps |
+| `mlb_get_game_uniforms` | Game uniform data |
+| `mlb_get_game_win_probability` | Win probability per at-bat |
+| `mlb_get_high_low` | Season high/low records |
+| `mlb_get_home_run_derby` | Home Run Derby |
+| `mlb_get_jobs` | Staff by job type |
+| `mlb_get_jobs_datacasters` | Datacaster roster |
+| `mlb_get_jobs_official_scorers` | Official scorer roster |
+| `mlb_get_jobs_umpires` | Umpire roster |
+| `mlb_get_leagues` | League details |
+| `mlb_get_live_feed` | Full live game data feed |
+| `mlb_get_meta` | API metadata (gameTypes, etc.) |
+| `mlb_get_people` | Multiple players by ID |
+| `mlb_get_people_changes` | Recent roster changes |
+| `mlb_get_person_game_stats` | Player stats in a specific game |
+| `mlb_get_play_by_play` | Play-by-play for a game |
+| `mlb_get_schedule_postseason_series` | Postseason series |
+| `mlb_get_schedule_postseason_tune_in` | Postseason tune-in info |
+| `mlb_get_schedule_tied` | Tied/suspended games |
+| `mlb_get_season` | Single season metadata |
+| `mlb_get_seasons` | Seasons (filtered) |
+| `mlb_get_sports` | All sports (MLB, AAA, ...) |
+| `mlb_get_sports_players` | All players for a sport |
+| `mlb_get_stats` | Individual player stats |
+| `mlb_get_stats_streaks` | Hitting/pitching streaks |
+| `mlb_get_team_alumni` | Team alumni |
+| `mlb_get_team_coaches` | Coaching staff |
+| `mlb_get_team_leaders` | Team stat leaders |
+| `mlb_get_team_personnel` | Front-office personnel |
+| `mlb_get_team_stats` | Team aggregate stats |
+| `mlb_get_team_uniforms` | Team uniform catalog |
+| `mlb_get_teams` | All teams |
+| `mlb_get_teams_affiliates` | Minor league affiliates |
+| `mlb_get_teams_history` | Historical team records |
+| `mlb_get_teams_stats` | League-wide team stats |
+| `mlb_get_umpire_games` | Umpire game assignments |
+| `mlb_get_venue` | Venue details |
+
+</details>
 
 ## Features
 
