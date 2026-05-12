@@ -19,35 +19,64 @@ directly.
 ## Install
 
 ```bash
-go install github.com/retr0h/mlb-mcp/cmd/mlb-mcp@latest
+go install github.com/retr0h/mlb-mcp@latest
 ```
 
 ## Usage
 
-Run the server (stdio transport, compatible with any MCP client):
+Run the MCP server over stdio:
 
 ```bash
-mlb-mcp
+mlb-mcp mcp start
 ```
 
-Configure your MCP client to launch `mlb-mcp` as a subprocess. For Claude
-Desktop, add to `claude_desktop_config.json`:
+### Claude Code
+
+This repo ships a `.claude/mcp.json` that Claude Code auto-discovers when
+your working directory is the repo root. Clone and open:
+
+```bash
+git clone https://github.com/retr0h/mlb-mcp.git
+cd mlb-mcp
+claude   # tools are available immediately
+```
+
+### Claude Desktop
+
+Add to `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "mlb": {
-      "command": "mlb-mcp"
+    "mlb-mcp": {
+      "command": "mlb-mcp",
+      "args": ["mcp", "start"]
     }
   }
 }
 ```
 
+### Other MCP clients
+
+Any client that supports stdio transport can launch `mlb-mcp mcp start` as
+a subprocess. See [`.claude/mcp.json`](.claude/mcp.json) for the canonical
+config.
+
 ## Tools
 
-| Tool          | MLB Stats API endpoint                   | Description                        |
-| ------------- | ---------------------------------------- | ---------------------------------- |
-| *(none yet — add rows here as tools are implemented)* | | |
+| Tool                  | Description                                                    |
+| --------------------- | -------------------------------------------------------------- |
+| `today_scores`        | Today's scores and game status across MLB                      |
+| `standings`           | Division standings for AL, NL, or both leagues                 |
+| `player_bio`          | Player biographical info by MLB person ID                      |
+| `team_info`           | Team metadata (venue, league, division) by team ID             |
+| `team_roster`         | Active roster for a team                                       |
+| `league_leaders`      | Stat leaders (HR, AVG, ERA, ...) with sensible defaults        |
+| `game_detail`         | Boxscore (team batting/pitching totals) for a game             |
+| `game_linescore`      | Inning-by-inning breakdown for a game                          |
+| `recent_transactions` | Recent trades, signings, DFAs (defaults to today)              |
+| `free_agents`         | Free-agent declarations and signings for a season              |
+| `postseason_schedule` | Postseason game schedule for a season                          |
 
 ## Features
 
