@@ -209,10 +209,7 @@ func emitArgsStruct(f *jen.File, o op) {
 			jsonTag += ",omitempty"
 		}
 		goTyp := goType(p.typ)
-		tags := map[string]string{"json": jsonTag}
-		if p.description != "" {
-			tags["jsonschema"] = p.description
-		}
+		tags := map[string]string{"json": jsonTag, "jsonschema": p.description}
 		fields = append(fields, jen.Id(p.goName).Add(goTyp).Tag(tags))
 	}
 	f.Type().Id(structName).Struct(fields...)

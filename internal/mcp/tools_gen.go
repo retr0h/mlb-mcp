@@ -227,10 +227,10 @@ func (s *Server) registerGeneratedTools() {
 }
 
 type getAllSeasonsArgs struct {
-	SportId    int    `json:"sportId,omitempty"`
-	DivisionId int    `json:"divisionId,omitempty"`
-	LeagueId   int    `json:"leagueId,omitempty"`
-	Fields     string `json:"fields,omitempty"`
+	SportId    int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	DivisionId int    `json:"divisionId,omitempty" jsonschema:"MLB division ID, e.g. 200 = AL West"`
+	LeagueId   int    `json:"leagueId,omitempty" jsonschema:"103 = AL, 104 = NL"`
+	Fields     string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetAllSeasons(ctx context.Context, _ *mcpsdk.CallToolRequest, args getAllSeasonsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -271,9 +271,9 @@ func (s *Server) toolGetAllSeasons(ctx context.Context, _ *mcpsdk.CallToolReques
 }
 
 type getAllStarBallotArgs struct {
-	LeagueId int    `json:"leagueId"`
-	Season   int    `json:"season"`
-	Fields   string `json:"fields,omitempty"`
+	LeagueId int    `json:"leagueId" jsonschema:"103 = AL, 104 = NL"`
+	Season   int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetAllStarBallot(ctx context.Context, _ *mcpsdk.CallToolRequest, args getAllStarBallotArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -309,9 +309,9 @@ func (s *Server) toolGetAllStarBallot(ctx context.Context, _ *mcpsdk.CallToolReq
 }
 
 type getAllStarFinalVoteArgs struct {
-	LeagueId int    `json:"leagueId"`
-	Season   int    `json:"season"`
-	Fields   string `json:"fields,omitempty"`
+	LeagueId int    `json:"leagueId" jsonschema:"103 = AL, 104 = NL"`
+	Season   int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetAllStarFinalVote(ctx context.Context, _ *mcpsdk.CallToolRequest, args getAllStarFinalVoteArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -347,9 +347,9 @@ func (s *Server) toolGetAllStarFinalVote(ctx context.Context, _ *mcpsdk.CallTool
 }
 
 type getAllStarWriteInsArgs struct {
-	LeagueId int    `json:"leagueId"`
-	Season   int    `json:"season"`
-	Fields   string `json:"fields,omitempty"`
+	LeagueId int    `json:"leagueId" jsonschema:"103 = AL, 104 = NL"`
+	Season   int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetAllStarWriteIns(ctx context.Context, _ *mcpsdk.CallToolRequest, args getAllStarWriteInsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -385,13 +385,13 @@ func (s *Server) toolGetAllStarWriteIns(ctx context.Context, _ *mcpsdk.CallToolR
 }
 
 type getAttendanceArgs struct {
-	TeamId       int    `json:"teamId,omitempty"`
-	LeagueId     int    `json:"leagueId,omitempty"`
-	Season       int    `json:"season,omitempty"`
+	TeamId       int    `json:"teamId,omitempty" jsonschema:"MLB team ID, e.g. 119 for Dodgers"`
+	LeagueId     int    `json:"leagueId,omitempty" jsonschema:"103 = AL, 104 = NL"`
+	Season       int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
 	Date         string `json:"date,omitempty" jsonschema:"YYYY-MM-DD"`
 	LeagueListId string `json:"leagueListId,omitempty" jsonschema:"e.g. milb_all"`
 	GameType     string `json:"gameType,omitempty" jsonschema:"R | S | E | A | D | F | L | W"`
-	Fields       string `json:"fields,omitempty"`
+	Fields       string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetAttendance(ctx context.Context, _ *mcpsdk.CallToolRequest, args getAttendanceArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -442,11 +442,11 @@ func (s *Server) toolGetAttendance(ctx context.Context, _ *mcpsdk.CallToolReques
 
 type getAwardRecipientsArgs struct {
 	AwardId  string `json:"awardId" jsonschema:"e.g. MLBHOF, ALMVP"`
-	SportId  int    `json:"sportId,omitempty"`
-	LeagueId int    `json:"leagueId,omitempty"`
-	Season   int    `json:"season,omitempty"`
-	Hydrate  string `json:"hydrate,omitempty"`
-	Fields   string `json:"fields,omitempty"`
+	SportId  int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	LeagueId int    `json:"leagueId,omitempty" jsonschema:"103 = AL, 104 = NL"`
+	Season   int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	Hydrate  string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate flags"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetAwardRecipients(ctx context.Context, _ *mcpsdk.CallToolRequest, args getAwardRecipientsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -491,9 +491,9 @@ func (s *Server) toolGetAwardRecipients(ctx context.Context, _ *mcpsdk.CallToolR
 }
 
 type getConferencesArgs struct {
-	ConferenceId int    `json:"conferenceId,omitempty"`
-	Season       int    `json:"season,omitempty"`
-	Fields       string `json:"fields,omitempty"`
+	ConferenceId int    `json:"conferenceId,omitempty" jsonschema:"MLB conference ID"`
+	Season       int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	Fields       string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetConferences(ctx context.Context, _ *mcpsdk.CallToolRequest, args getConferencesArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -531,9 +531,9 @@ func (s *Server) toolGetConferences(ctx context.Context, _ *mcpsdk.CallToolReque
 }
 
 type getContextMetricsArgs struct {
-	GamePk   int    `json:"gamePk"`
-	Timecode string `json:"timecode,omitempty"`
-	Fields   string `json:"fields,omitempty"`
+	GamePk   int    `json:"gamePk" jsonschema:"Unique game identifier"`
+	Timecode string `json:"timecode,omitempty" jsonschema:"Point-in-time code YYYYMMDD_HHmmss"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetContextMetrics(ctx context.Context, _ *mcpsdk.CallToolRequest, args getContextMetricsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -569,10 +569,10 @@ func (s *Server) toolGetContextMetrics(ctx context.Context, _ *mcpsdk.CallToolRe
 }
 
 type getDivisionsArgs struct {
-	DivisionId int `json:"divisionId,omitempty"`
-	LeagueId   int `json:"leagueId,omitempty"`
+	DivisionId int `json:"divisionId,omitempty" jsonschema:"MLB division ID, e.g. 200 = AL West"`
+	LeagueId   int `json:"leagueId,omitempty" jsonschema:"103 = AL, 104 = NL"`
 	SportId    int `json:"sportId,omitempty" jsonschema:"1 = MLB"`
-	Season     int `json:"season,omitempty"`
+	Season     int `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
 }
 
 func (s *Server) toolGetDivisions(ctx context.Context, _ *mcpsdk.CallToolRequest, args getDivisionsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -614,10 +614,10 @@ func (s *Server) toolGetDivisions(ctx context.Context, _ *mcpsdk.CallToolRequest
 
 type getGameChangesArgs struct {
 	UpdatedSince string `json:"updatedSince" jsonschema:"ISO-8601 timestamp"`
-	SportId      int    `json:"sportId,omitempty"`
-	GameType     string `json:"gameType,omitempty"`
-	Season       int    `json:"season,omitempty"`
-	Fields       string `json:"fields,omitempty"`
+	SportId      int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	GameType     string `json:"gameType,omitempty" jsonschema:"R = regular, S = spring, E = exhibition, A = all-star, D/F/L/W = postseason"`
+	Season       int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	Fields       string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetGameChanges(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGameChangesArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -661,9 +661,9 @@ func (s *Server) toolGetGameChanges(ctx context.Context, _ *mcpsdk.CallToolReque
 }
 
 type getGameColorArgs struct {
-	GamePk   int    `json:"gamePk"`
-	Timecode string `json:"timecode,omitempty"`
-	Fields   string `json:"fields,omitempty"`
+	GamePk   int    `json:"gamePk" jsonschema:"Unique game identifier"`
+	Timecode string `json:"timecode,omitempty" jsonschema:"Point-in-time code YYYYMMDD_HHmmss"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetGameColor(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGameColorArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -699,9 +699,9 @@ func (s *Server) toolGetGameColor(ctx context.Context, _ *mcpsdk.CallToolRequest
 }
 
 type getGameColorDiffArgs struct {
-	GamePk        int    `json:"gamePk"`
-	StartTimecode string `json:"startTimecode"`
-	EndTimecode   string `json:"endTimecode"`
+	GamePk        int    `json:"gamePk" jsonschema:"Unique game identifier"`
+	StartTimecode string `json:"startTimecode" jsonschema:"Start timecode YYYYMMDD_HHmmss"`
+	EndTimecode   string `json:"endTimecode" jsonschema:"End timecode YYYYMMDD_HHmmss"`
 }
 
 func (s *Server) toolGetGameColorDiff(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGameColorDiffArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -737,7 +737,7 @@ func (s *Server) toolGetGameColorDiff(ctx context.Context, _ *mcpsdk.CallToolReq
 }
 
 type getGameColorTimestampsArgs struct {
-	GamePk int `json:"gamePk"`
+	GamePk int `json:"gamePk" jsonschema:"Unique game identifier"`
 }
 
 func (s *Server) toolGetGameColorTimestamps(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGameColorTimestampsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -763,8 +763,8 @@ func (s *Server) toolGetGameColorTimestamps(ctx context.Context, _ *mcpsdk.CallT
 }
 
 type getGameContentArgs struct {
-	GamePk         int `json:"gamePk"`
-	HighlightLimit int `json:"highlightLimit,omitempty"`
+	GamePk         int `json:"gamePk" jsonschema:"Unique game identifier"`
+	HighlightLimit int `json:"highlightLimit,omitempty" jsonschema:"Maximum number of highlights to return"`
 }
 
 func (s *Server) toolGetGameContent(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGameContentArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -797,9 +797,9 @@ func (s *Server) toolGetGameContent(ctx context.Context, _ *mcpsdk.CallToolReque
 }
 
 type getGameDiffArgs struct {
-	GamePk        int    `json:"gamePk"`
-	StartTimecode string `json:"startTimecode"`
-	EndTimecode   string `json:"endTimecode"`
+	GamePk        int    `json:"gamePk" jsonschema:"Unique game identifier"`
+	StartTimecode string `json:"startTimecode" jsonschema:"Start timecode YYYYMMDD_HHmmss"`
+	EndTimecode   string `json:"endTimecode" jsonschema:"End timecode YYYYMMDD_HHmmss"`
 }
 
 func (s *Server) toolGetGameDiff(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGameDiffArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -835,18 +835,18 @@ func (s *Server) toolGetGameDiff(ctx context.Context, _ *mcpsdk.CallToolRequest,
 }
 
 type getGamePaceArgs struct {
-	Season          int    `json:"season"`
-	SportId         int    `json:"sportId,omitempty"`
-	TeamIds         string `json:"teamIds,omitempty"`
-	LeagueIds       string `json:"leagueIds,omitempty"`
-	LeagueListId    string `json:"leagueListId,omitempty"`
-	GameType        string `json:"gameType,omitempty"`
-	StartDate       string `json:"startDate,omitempty"`
-	EndDate         string `json:"endDate,omitempty"`
-	VenueIds        string `json:"venueIds,omitempty"`
-	OrgType         string `json:"orgType,omitempty"`
-	IncludeChildren bool   `json:"includeChildren,omitempty"`
-	Fields          string `json:"fields,omitempty"`
+	Season          int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	SportId         int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	TeamIds         string `json:"teamIds,omitempty" jsonschema:"Comma-separated team IDs"`
+	LeagueIds       string `json:"leagueIds,omitempty" jsonschema:"Comma-separated league IDs"`
+	LeagueListId    string `json:"leagueListId,omitempty" jsonschema:"Named league list, e.g. milb_all"`
+	GameType        string `json:"gameType,omitempty" jsonschema:"R = regular, S = spring, E = exhibition, A = all-star, D/F/L/W = postseason"`
+	StartDate       string `json:"startDate,omitempty" jsonschema:"Start date in YYYY-MM-DD format"`
+	EndDate         string `json:"endDate,omitempty" jsonschema:"End date in YYYY-MM-DD format"`
+	VenueIds        string `json:"venueIds,omitempty" jsonschema:"Comma-separated venue IDs"`
+	OrgType         string `json:"orgType,omitempty" jsonschema:"Organization type: player, team, division, league, sport, types"`
+	IncludeChildren bool   `json:"includeChildren,omitempty" jsonschema:"Include child organizations"`
+	Fields          string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetGamePace(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGamePaceArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -911,7 +911,7 @@ func (s *Server) toolGetGamePace(ctx context.Context, _ *mcpsdk.CallToolRequest,
 }
 
 type getGameTimestampsArgs struct {
-	GamePk int `json:"gamePk"`
+	GamePk int `json:"gamePk" jsonschema:"Unique game identifier"`
 }
 
 func (s *Server) toolGetGameTimestamps(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGameTimestampsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -938,7 +938,7 @@ func (s *Server) toolGetGameTimestamps(ctx context.Context, _ *mcpsdk.CallToolRe
 
 type getGameUniformsArgs struct {
 	GamePks string `json:"gamePks" jsonschema:"comma-separated game pks"`
-	Fields  string `json:"fields,omitempty"`
+	Fields  string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetGameUniforms(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGameUniformsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -973,9 +973,9 @@ func (s *Server) toolGetGameUniforms(ctx context.Context, _ *mcpsdk.CallToolRequ
 }
 
 type getGameWinProbabilityArgs struct {
-	GamePk   int    `json:"gamePk"`
-	Timecode string `json:"timecode,omitempty"`
-	Fields   string `json:"fields,omitempty"`
+	GamePk   int    `json:"gamePk" jsonschema:"Unique game identifier"`
+	Timecode string `json:"timecode,omitempty" jsonschema:"Point-in-time code YYYYMMDD_HHmmss"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetGameWinProbability(ctx context.Context, _ *mcpsdk.CallToolRequest, args getGameWinProbabilityArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1013,14 +1013,14 @@ func (s *Server) toolGetGameWinProbability(ctx context.Context, _ *mcpsdk.CallTo
 type getHighLowArgs struct {
 	OrgType   string `json:"orgType" jsonschema:"player | team | division | league | sport | types"`
 	SortStat  string `json:"sortStat,omitempty" jsonschema:"e.g. homeRuns, hits, strikeOuts"`
-	Season    int    `json:"season,omitempty"`
-	GameType  string `json:"gameType,omitempty"`
-	TeamId    int    `json:"teamId,omitempty"`
-	LeagueId  int    `json:"leagueId,omitempty"`
-	SportIds  string `json:"sportIds,omitempty"`
-	StatGroup string `json:"statGroup,omitempty"`
-	Limit     int    `json:"limit,omitempty"`
-	Fields    string `json:"fields,omitempty"`
+	Season    int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	GameType  string `json:"gameType,omitempty" jsonschema:"R = regular, S = spring, E = exhibition, A = all-star, D/F/L/W = postseason"`
+	TeamId    int    `json:"teamId,omitempty" jsonschema:"MLB team ID, e.g. 119 for Dodgers"`
+	LeagueId  int    `json:"leagueId,omitempty" jsonschema:"103 = AL, 104 = NL"`
+	SportIds  string `json:"sportIds,omitempty" jsonschema:"Comma-separated sport IDs"`
+	StatGroup string `json:"statGroup,omitempty" jsonschema:"Stat group: hitting, pitching, fielding"`
+	Limit     int    `json:"limit,omitempty" jsonschema:"Maximum number of results"`
+	Fields    string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetHighLow(ctx context.Context, _ *mcpsdk.CallToolRequest, args getHighLowArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1077,8 +1077,8 @@ func (s *Server) toolGetHighLow(ctx context.Context, _ *mcpsdk.CallToolRequest, 
 }
 
 type getHomeRunDerbyArgs struct {
-	GamePk int    `json:"gamePk"`
-	Fields string `json:"fields,omitempty"`
+	GamePk int    `json:"gamePk" jsonschema:"Unique game identifier"`
+	Fields string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetHomeRunDerby(ctx context.Context, _ *mcpsdk.CallToolRequest, args getHomeRunDerbyArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1112,9 +1112,9 @@ func (s *Server) toolGetHomeRunDerby(ctx context.Context, _ *mcpsdk.CallToolRequ
 
 type getJobsArgs struct {
 	JobType string `json:"jobType" jsonschema:"e.g. UMPR, SCOR, DCST"`
-	SportId int    `json:"sportId,omitempty"`
-	Date    string `json:"date,omitempty"`
-	Fields  string `json:"fields,omitempty"`
+	SportId int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	Date    string `json:"date,omitempty" jsonschema:"Date in YYYY-MM-DD format"`
+	Fields  string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetJobs(ctx context.Context, _ *mcpsdk.CallToolRequest, args getJobsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1155,9 +1155,9 @@ func (s *Server) toolGetJobs(ctx context.Context, _ *mcpsdk.CallToolRequest, arg
 }
 
 type getJobsDatacastersArgs struct {
-	SportId int    `json:"sportId,omitempty"`
-	Date    string `json:"date,omitempty"`
-	Fields  string `json:"fields,omitempty"`
+	SportId int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	Date    string `json:"date,omitempty" jsonschema:"Date in YYYY-MM-DD format"`
+	Fields  string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetJobsDatacasters(ctx context.Context, _ *mcpsdk.CallToolRequest, args getJobsDatacastersArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1195,8 +1195,8 @@ func (s *Server) toolGetJobsDatacasters(ctx context.Context, _ *mcpsdk.CallToolR
 }
 
 type getJobsOfficialScorersArgs struct {
-	Timecode string `json:"timecode,omitempty"`
-	Fields   string `json:"fields,omitempty"`
+	Timecode string `json:"timecode,omitempty" jsonschema:"Point-in-time code YYYYMMDD_HHmmss"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetJobsOfficialScorers(ctx context.Context, _ *mcpsdk.CallToolRequest, args getJobsOfficialScorersArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1231,9 +1231,9 @@ func (s *Server) toolGetJobsOfficialScorers(ctx context.Context, _ *mcpsdk.CallT
 }
 
 type getJobsUmpiresArgs struct {
-	SportId int    `json:"sportId,omitempty"`
-	Date    string `json:"date,omitempty"`
-	Fields  string `json:"fields,omitempty"`
+	SportId int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	Date    string `json:"date,omitempty" jsonschema:"Date in YYYY-MM-DD format"`
+	Fields  string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetJobsUmpires(ctx context.Context, _ *mcpsdk.CallToolRequest, args getJobsUmpiresArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1274,7 +1274,7 @@ type getLeaguesArgs struct {
 	SportId   int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
 	LeagueIds string `json:"leagueIds,omitempty" jsonschema:"comma-separated league ids"`
 	Seasons   string `json:"seasons,omitempty" jsonschema:"comma-separated seasons"`
-	Fields    string `json:"fields,omitempty"`
+	Fields    string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetLeagues(ctx context.Context, _ *mcpsdk.CallToolRequest, args getLeaguesArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1315,7 +1315,7 @@ func (s *Server) toolGetLeagues(ctx context.Context, _ *mcpsdk.CallToolRequest, 
 }
 
 type getLiveFeedArgs struct {
-	GamePk int `json:"gamePk"`
+	GamePk int `json:"gamePk" jsonschema:"Unique game identifier"`
 }
 
 func (s *Server) toolGetLiveFeed(ctx context.Context, _ *mcpsdk.CallToolRequest, args getLiveFeedArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1368,8 +1368,8 @@ func (s *Server) toolGetMeta(ctx context.Context, _ *mcpsdk.CallToolRequest, arg
 
 type getPeopleArgs struct {
 	PersonIds string `json:"personIds" jsonschema:"comma-separated person ids"`
-	Hydrate   string `json:"hydrate,omitempty"`
-	Fields    string `json:"fields,omitempty"`
+	Hydrate   string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate flags"`
+	Fields    string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetPeople(ctx context.Context, _ *mcpsdk.CallToolRequest, args getPeopleArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1407,8 +1407,8 @@ func (s *Server) toolGetPeople(ctx context.Context, _ *mcpsdk.CallToolRequest, a
 }
 
 type getPeopleChangesArgs struct {
-	UpdatedSince string `json:"updatedSince,omitempty"`
-	Fields       string `json:"fields,omitempty"`
+	UpdatedSince string `json:"updatedSince,omitempty" jsonschema:"ISO-8601 timestamp"`
+	Fields       string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetPeopleChanges(ctx context.Context, _ *mcpsdk.CallToolRequest, args getPeopleChangesArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1443,9 +1443,9 @@ func (s *Server) toolGetPeopleChanges(ctx context.Context, _ *mcpsdk.CallToolReq
 }
 
 type getPersonGameStatsArgs struct {
-	PersonId int    `json:"personId"`
-	GamePk   int    `json:"gamePk"`
-	Fields   string `json:"fields,omitempty"`
+	PersonId int    `json:"personId" jsonschema:"MLB person ID, e.g. 660271 for Ohtani"`
+	GamePk   int    `json:"gamePk" jsonschema:"Unique game identifier"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetPersonGameStats(ctx context.Context, _ *mcpsdk.CallToolRequest, args getPersonGameStatsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1479,7 +1479,7 @@ func (s *Server) toolGetPersonGameStats(ctx context.Context, _ *mcpsdk.CallToolR
 }
 
 type getPlayByPlayArgs struct {
-	GamePk int `json:"gamePk"`
+	GamePk int `json:"gamePk" jsonschema:"Unique game identifier"`
 }
 
 func (s *Server) toolGetPlayByPlay(ctx context.Context, _ *mcpsdk.CallToolRequest, args getPlayByPlayArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1505,12 +1505,12 @@ func (s *Server) toolGetPlayByPlay(ctx context.Context, _ *mcpsdk.CallToolReques
 }
 
 type getSchedulePostseasonSeriesArgs struct {
-	Season       int    `json:"season,omitempty"`
-	GameTypes    string `json:"gameTypes,omitempty"`
-	SeriesNumber int    `json:"seriesNumber,omitempty"`
-	TeamId       int    `json:"teamId,omitempty"`
-	SportId      int    `json:"sportId,omitempty"`
-	Fields       string `json:"fields,omitempty"`
+	Season       int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	GameTypes    string `json:"gameTypes,omitempty" jsonschema:"Comma-separated game type codes"`
+	SeriesNumber int    `json:"seriesNumber,omitempty" jsonschema:"Postseason series number"`
+	TeamId       int    `json:"teamId,omitempty" jsonschema:"MLB team ID, e.g. 119 for Dodgers"`
+	SportId      int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	Fields       string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetSchedulePostseasonSeries(ctx context.Context, _ *mcpsdk.CallToolRequest, args getSchedulePostseasonSeriesArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1557,11 +1557,11 @@ func (s *Server) toolGetSchedulePostseasonSeries(ctx context.Context, _ *mcpsdk.
 }
 
 type getSchedulePostseasonTuneInArgs struct {
-	Season  int    `json:"season,omitempty"`
-	TeamId  int    `json:"teamId,omitempty"`
-	SportId int    `json:"sportId,omitempty"`
-	Hydrate string `json:"hydrate,omitempty"`
-	Fields  string `json:"fields,omitempty"`
+	Season  int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	TeamId  int    `json:"teamId,omitempty" jsonschema:"MLB team ID, e.g. 119 for Dodgers"`
+	SportId int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	Hydrate string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate flags"`
+	Fields  string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetSchedulePostseasonTuneIn(ctx context.Context, _ *mcpsdk.CallToolRequest, args getSchedulePostseasonTuneInArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1605,10 +1605,10 @@ func (s *Server) toolGetSchedulePostseasonTuneIn(ctx context.Context, _ *mcpsdk.
 }
 
 type getScheduleTiedArgs struct {
-	Season    int    `json:"season"`
-	GameTypes string `json:"gameTypes,omitempty"`
-	Hydrate   string `json:"hydrate,omitempty"`
-	Fields    string `json:"fields,omitempty"`
+	Season    int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	GameTypes string `json:"gameTypes,omitempty" jsonschema:"Comma-separated game type codes"`
+	Hydrate   string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate flags"`
+	Fields    string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetScheduleTied(ctx context.Context, _ *mcpsdk.CallToolRequest, args getScheduleTiedArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1687,10 +1687,10 @@ func (s *Server) toolGetSeason(ctx context.Context, _ *mcpsdk.CallToolRequest, a
 }
 
 type getSeasonsArgs struct {
-	Season     int    `json:"season,omitempty"`
-	SportId    int    `json:"sportId,omitempty"`
-	DivisionId int    `json:"divisionId,omitempty"`
-	LeagueId   int    `json:"leagueId,omitempty"`
+	Season     int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	SportId    int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	DivisionId int    `json:"divisionId,omitempty" jsonschema:"MLB division ID, e.g. 200 = AL West"`
+	LeagueId   int    `json:"leagueId,omitempty" jsonschema:"103 = AL, 104 = NL"`
 	Fields     string `json:"fields,omitempty" jsonschema:"comma-separated field projection"`
 }
 
@@ -1771,10 +1771,10 @@ func (s *Server) toolGetSports(ctx context.Context, _ *mcpsdk.CallToolRequest, a
 }
 
 type getSportsPlayersArgs struct {
-	SportId  int    `json:"sportId"`
-	Season   int    `json:"season"`
-	GameType string `json:"gameType,omitempty"`
-	Fields   string `json:"fields,omitempty"`
+	SportId  int    `json:"sportId" jsonschema:"1 = MLB"`
+	Season   int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	GameType string `json:"gameType,omitempty" jsonschema:"R = regular, S = spring, E = exhibition, A = all-star, D/F/L/W = postseason"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetSportsPlayers(ctx context.Context, _ *mcpsdk.CallToolRequest, args getSportsPlayersArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1813,14 +1813,14 @@ func (s *Server) toolGetSportsPlayers(ctx context.Context, _ *mcpsdk.CallToolReq
 }
 
 type getStatsStreaksArgs struct {
-	StreakType string `json:"streakType"`
-	StreakSpan string `json:"streakSpan"`
-	Season     int    `json:"season"`
-	SportId    int    `json:"sportId"`
-	Limit      int    `json:"limit"`
-	GameType   string `json:"gameType,omitempty"`
-	Hydrate    string `json:"hydrate,omitempty"`
-	Fields     string `json:"fields,omitempty"`
+	StreakType string `json:"streakType" jsonschema:"Streak type, e.g. hittingStreak"`
+	StreakSpan string `json:"streakSpan" jsonschema:"Streak span: season, career, currentStreak"`
+	Season     int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	SportId    int    `json:"sportId" jsonschema:"1 = MLB"`
+	Limit      int    `json:"limit" jsonschema:"Maximum number of results"`
+	GameType   string `json:"gameType,omitempty" jsonschema:"R = regular, S = spring, E = exhibition, A = all-star, D/F/L/W = postseason"`
+	Hydrate    string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate flags"`
+	Fields     string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetStatsStreaks(ctx context.Context, _ *mcpsdk.CallToolRequest, args getStatsStreaksArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1873,11 +1873,11 @@ func (s *Server) toolGetStatsStreaks(ctx context.Context, _ *mcpsdk.CallToolRequ
 }
 
 type getTeamAlumniArgs struct {
-	TeamId  int    `json:"teamId"`
-	Season  int    `json:"season"`
+	TeamId  int    `json:"teamId" jsonschema:"MLB team ID, e.g. 119 for Dodgers"`
+	Season  int    `json:"season" jsonschema:"Season year, e.g. 2024"`
 	Group   string `json:"group" jsonschema:"hitting | pitching | fielding"`
-	Hydrate string `json:"hydrate,omitempty"`
-	Fields  string `json:"fields,omitempty"`
+	Hydrate string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate flags"`
+	Fields  string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetTeamAlumni(ctx context.Context, _ *mcpsdk.CallToolRequest, args getTeamAlumniArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1919,10 +1919,10 @@ func (s *Server) toolGetTeamAlumni(ctx context.Context, _ *mcpsdk.CallToolReques
 }
 
 type getTeamCoachesArgs struct {
-	TeamId int    `json:"teamId"`
-	Season int    `json:"season,omitempty"`
-	Date   string `json:"date,omitempty"`
-	Fields string `json:"fields,omitempty"`
+	TeamId int    `json:"teamId" jsonschema:"MLB team ID, e.g. 119 for Dodgers"`
+	Season int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	Date   string `json:"date,omitempty" jsonschema:"Date in YYYY-MM-DD format"`
+	Fields string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetTeamCoaches(ctx context.Context, _ *mcpsdk.CallToolRequest, args getTeamCoachesArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -1961,13 +1961,13 @@ func (s *Server) toolGetTeamCoaches(ctx context.Context, _ *mcpsdk.CallToolReque
 }
 
 type getTeamLeadersArgs struct {
-	TeamId           int    `json:"teamId"`
-	LeaderCategories string `json:"leaderCategories"`
-	Season           int    `json:"season"`
-	LeaderGameTypes  string `json:"leaderGameTypes,omitempty"`
-	Hydrate          string `json:"hydrate,omitempty"`
-	Limit            int    `json:"limit,omitempty"`
-	Fields           string `json:"fields,omitempty"`
+	TeamId           int    `json:"teamId" jsonschema:"MLB team ID, e.g. 119 for Dodgers"`
+	LeaderCategories string `json:"leaderCategories" jsonschema:"Stat category, e.g. homeRuns, battingAverage"`
+	Season           int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	LeaderGameTypes  string `json:"leaderGameTypes,omitempty" jsonschema:"Game type filter for leaders"`
+	Hydrate          string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate flags"`
+	Limit            int    `json:"limit,omitempty" jsonschema:"Maximum number of results"`
+	Fields           string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetTeamLeaders(ctx context.Context, _ *mcpsdk.CallToolRequest, args getTeamLeadersArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -2015,9 +2015,9 @@ func (s *Server) toolGetTeamLeaders(ctx context.Context, _ *mcpsdk.CallToolReque
 }
 
 type getTeamPersonnelArgs struct {
-	TeamId int    `json:"teamId"`
-	Date   string `json:"date,omitempty"`
-	Fields string `json:"fields,omitempty"`
+	TeamId int    `json:"teamId" jsonschema:"MLB team ID, e.g. 119 for Dodgers"`
+	Date   string `json:"date,omitempty" jsonschema:"Date in YYYY-MM-DD format"`
+	Fields string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetTeamPersonnel(ctx context.Context, _ *mcpsdk.CallToolRequest, args getTeamPersonnelArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -2053,8 +2053,8 @@ func (s *Server) toolGetTeamPersonnel(ctx context.Context, _ *mcpsdk.CallToolReq
 }
 
 type getTeamStatsArgs struct {
-	TeamId int    `json:"teamId"`
-	Season int    `json:"season,omitempty"`
+	TeamId int    `json:"teamId" jsonschema:"MLB team ID, e.g. 119 for Dodgers"`
+	Season int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
 	Stats  string `json:"stats,omitempty" jsonschema:"e.g. season, byDateRange"`
 	Group  string `json:"group,omitempty" jsonschema:"hitting | pitching | fielding"`
 }
@@ -2096,8 +2096,8 @@ func (s *Server) toolGetTeamStats(ctx context.Context, _ *mcpsdk.CallToolRequest
 
 type getTeamUniformsArgs struct {
 	TeamIds string `json:"teamIds" jsonschema:"comma-separated team ids"`
-	Season  int    `json:"season,omitempty"`
-	Fields  string `json:"fields,omitempty"`
+	Season  int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	Fields  string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetTeamUniforms(ctx context.Context, _ *mcpsdk.CallToolRequest, args getTeamUniformsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -2135,14 +2135,14 @@ func (s *Server) toolGetTeamUniforms(ctx context.Context, _ *mcpsdk.CallToolRequ
 }
 
 type getTeamsArgs struct {
-	Season       int    `json:"season,omitempty"`
+	Season       int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
 	ActiveStatus string `json:"activeStatus,omitempty" jsonschema:"ACTIVE | INACTIVE | BOTH"`
 	LeagueIds    string `json:"leagueIds,omitempty" jsonschema:"comma-separated league ids"`
 	SportId      int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
 	SportIds     string `json:"sportIds,omitempty" jsonschema:"comma-separated sport ids"`
 	GameType     string `json:"gameType,omitempty" jsonschema:"R | S | E | A | D | F | L | W"`
-	Hydrate      string `json:"hydrate,omitempty"`
-	Fields       string `json:"fields,omitempty"`
+	Hydrate      string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate flags"`
+	Fields       string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetTeams(ctx context.Context, _ *mcpsdk.CallToolRequest, args getTeamsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -2196,10 +2196,10 @@ func (s *Server) toolGetTeams(ctx context.Context, _ *mcpsdk.CallToolRequest, ar
 
 type getTeamsAffiliatesArgs struct {
 	TeamIds string `json:"teamIds" jsonschema:"comma-separated team ids"`
-	SportId int    `json:"sportId,omitempty"`
-	Season  int    `json:"season,omitempty"`
-	Hydrate string `json:"hydrate,omitempty"`
-	Fields  string `json:"fields,omitempty"`
+	SportId int    `json:"sportId,omitempty" jsonschema:"1 = MLB"`
+	Season  int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
+	Hydrate string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate flags"`
+	Fields  string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetTeamsAffiliates(ctx context.Context, _ *mcpsdk.CallToolRequest, args getTeamsAffiliatesArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -2244,9 +2244,9 @@ func (s *Server) toolGetTeamsAffiliates(ctx context.Context, _ *mcpsdk.CallToolR
 
 type getTeamsHistoryArgs struct {
 	TeamIds     string `json:"teamIds" jsonschema:"comma-separated team ids"`
-	StartSeason int    `json:"startSeason,omitempty"`
-	EndSeason   int    `json:"endSeason,omitempty"`
-	Fields      string `json:"fields,omitempty"`
+	StartSeason int    `json:"startSeason,omitempty" jsonschema:"Start season year"`
+	EndSeason   int    `json:"endSeason,omitempty" jsonschema:"End season year"`
+	Fields      string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetTeamsHistory(ctx context.Context, _ *mcpsdk.CallToolRequest, args getTeamsHistoryArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -2287,16 +2287,16 @@ func (s *Server) toolGetTeamsHistory(ctx context.Context, _ *mcpsdk.CallToolRequ
 }
 
 type getTeamsStatsArgs struct {
-	Season    int    `json:"season"`
-	SportIds  string `json:"sportIds,omitempty"`
-	Group     string `json:"group"`
-	Stats     string `json:"stats"`
-	GameType  string `json:"gameType,omitempty"`
-	Order     string `json:"order,omitempty"`
-	SortStat  string `json:"sortStat,omitempty"`
-	StartDate string `json:"startDate,omitempty"`
-	EndDate   string `json:"endDate,omitempty"`
-	Fields    string `json:"fields,omitempty"`
+	Season    int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	SportIds  string `json:"sportIds,omitempty" jsonschema:"Comma-separated sport IDs"`
+	Group     string `json:"group" jsonschema:"Stat group: hitting, pitching, fielding"`
+	Stats     string `json:"stats" jsonschema:"Stat type: season, career, byDateRange"`
+	GameType  string `json:"gameType,omitempty" jsonschema:"R = regular, S = spring, E = exhibition, A = all-star, D/F/L/W = postseason"`
+	Order     string `json:"order,omitempty" jsonschema:"Sort order: asc or desc"`
+	SortStat  string `json:"sortStat,omitempty" jsonschema:"Stat to sort by, e.g. homeRuns"`
+	StartDate string `json:"startDate,omitempty" jsonschema:"Start date in YYYY-MM-DD format"`
+	EndDate   string `json:"endDate,omitempty" jsonschema:"End date in YYYY-MM-DD format"`
+	Fields    string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetTeamsStats(ctx context.Context, _ *mcpsdk.CallToolRequest, args getTeamsStatsArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -2355,9 +2355,9 @@ func (s *Server) toolGetTeamsStats(ctx context.Context, _ *mcpsdk.CallToolReques
 }
 
 type getUmpireGamesArgs struct {
-	UmpireId int    `json:"umpireId"`
-	Season   int    `json:"season"`
-	Fields   string `json:"fields,omitempty"`
+	UmpireId int    `json:"umpireId" jsonschema:"MLB umpire person ID"`
+	Season   int    `json:"season" jsonschema:"Season year, e.g. 2024"`
+	Fields   string `json:"fields,omitempty" jsonschema:"Comma-separated field projection"`
 }
 
 func (s *Server) toolGetUmpireGames(ctx context.Context, _ *mcpsdk.CallToolRequest, args getUmpireGamesArgs) (*mcpsdk.CallToolResult, any, error) {
@@ -2393,8 +2393,8 @@ func (s *Server) toolGetUmpireGames(ctx context.Context, _ *mcpsdk.CallToolReque
 }
 
 type getVenueArgs struct {
-	VenueId int    `json:"venueId"`
-	Season  int    `json:"season,omitempty"`
+	VenueId int    `json:"venueId" jsonschema:"MLB venue ID"`
+	Season  int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2024"`
 	Hydrate string `json:"hydrate,omitempty" jsonschema:"comma-separated hydrate flags (e.g. location,fieldInfo,timezone)"`
 	Fields  string `json:"fields,omitempty" jsonschema:"comma-separated field projection"`
 }
