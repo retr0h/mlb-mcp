@@ -29,7 +29,12 @@ test:
 
 # Format, lint before committing
 ready:
+    just generate
     just just::fmt
     just docs::fmt
     just go::fmt
     just go::vet
+
+# Run code generation (mcpgen)
+generate:
+    just go::generate
