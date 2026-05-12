@@ -1,22 +1,6 @@
 // Copyright (c) 2026 John Dewey
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
+//
+// SPDX-License-Identifier: MIT
 
 // Package cmd contains the mlb-mcp cobra command tree.
 package cmd
@@ -24,13 +8,23 @@ package cmd
 import (
 	"log/slog"
 	"os"
+	"strings"
+	"time"
 
+	"github.com/lmittmann/tint"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"golang.org/x/term"
 )
 
-// logger is the package-level slog logger. Targets stderr so it never
-// contaminates the JSON-RPC wire on stdout.
-var logger = slog.New(slog.NewTextHandler(os.Stderr, nil))
+// logger is the package-level slog logger, populated from initLogger
+// after cobra parses persistent flags. MCP subcommands pass it to the
+// server via Config so all diagnostic output targets stderr — stdout is
+// reserved for the JSON-RPC wire.
+var (
+	logger     = slog.New(slog.NewTextHandler(os.Stderr, nil))
+	jsonOutput bool
+)
 
 var rootCmd = &cobra.Command{
 	Use:   "mlb-mcp",
@@ -56,4 +50,40 @@ func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+func init() {
+	cobra.OnInitialize(initConfig, initLogger)
+
+	rootCmd.PersistentFlags().BoolP("debug", "d", false, "enable debug logging")
+	rootCmd.PersistentFlags().BoolVarP(&jsonOutput, "json", "j", false, "emit logs as JSON")
+
+	_ = viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+}
+
+func initConfig() {
+	viper.SetEnvPrefix("mlb_mcp")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
+}
+
+func initLogger() {
+	level := slog.LevelInfo
+	if viper.GetBool("debug") {
+		level = slog.LevelDebug
+	}
+
+	var handler slog.Handler
+	if jsonOutput {
+		handler = slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: level})
+	} else {
+		handler = tint.NewHandler(os.Stderr, &tint.Options{
+			Level:      level,
+			TimeFormat: time.Kitchen,
+			NoColor:    !term.IsTerminal(int(os.Stderr.Fd())),
+		})
+	}
+
+	logger = slog.New(handler)
+	slog.SetDefault(logger)
 }
