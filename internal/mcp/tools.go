@@ -33,11 +33,13 @@ import (
 // registerTools wires every MLB MCP tool onto s.mcp.
 func (s *Server) registerTools() {
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
-		Name: "today_scores",
-		Description: "Use this when the user asks who won today, what are today's scores, " +
-			"or what games are being played today. Returns every MLB game scheduled for today " +
-			"with team names, scores, and game status (Final/Live/Scheduled).",
-	}, s.toolTodayScores)
+		Name: "scores",
+		Description: "Use this when the user asks about scores, game results, who won, " +
+			"or what games were played on any date. Returns MLB games with team names, " +
+			"scores, and game status (Final/Live/Scheduled). Defaults to today when no " +
+			"date is given. Supports single date or date range. Use this to find gamePk " +
+			"values needed by game_detail and game_linescore.",
+	}, s.toolScores)
 
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
 		Name: "standings",
@@ -84,7 +86,7 @@ func (s *Server) registerTools() {
 		Description: "Use this when the user asks what happened in a specific game — 'what " +
 			"were the stats in game 745455', 'show me the boxscore'. Returns team batting and " +
 			"pitching stats for both home and away teams. Requires the game's MLB gamePk " +
-			"(obtainable from today_scores or postseason_schedule).",
+			"(obtainable from scores or postseason_schedule).",
 	}, s.toolGameDetail)
 
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
@@ -122,8 +124,12 @@ func (s *Server) registerTools() {
 
 // --- args structs ---
 
-// todayScoresArgs has no fields — today_scores always operates on today.
-type todayScoresArgs struct{}
+type scoresArgs struct {
+	Date string `json:"date,omitempty"    jsonschema:"Date in YYYY-MM-DD format. Defaults to today. Use for 'yesterday', 'last Tuesday', etc."`
+	From string `json:"from,omitempty"    jsonschema:"Start of date range in YYYY-MM-DD format. Requires 'to'."`
+	To   string `json:"to,omitempty"      jsonschema:"End of date range in YYYY-MM-DD format. Requires 'from'."`
+	Team int    `json:"team_id,omitempty" jsonschema:"Filter to a single team by MLB team ID, e.g. 119 for Dodgers."`
+}
 
 type standingsArgs struct {
 	League string `json:"league,omitempty" jsonschema:"Filter to a single league: 'AL' or 'NL'. Omit for both leagues."`
@@ -150,11 +156,11 @@ type leagueLeadersArgs struct {
 }
 
 type gameDetailArgs struct {
-	GamePk int `json:"game_pk" jsonschema:"MLB game PK (required). Obtain from today_scores or postseason_schedule."`
+	GamePk int `json:"game_pk" jsonschema:"MLB game PK (required). Obtain from scores or postseason_schedule."`
 }
 
 type gameLinescoreArgs struct {
-	GamePk int `json:"game_pk" jsonschema:"MLB game PK (required). Obtain from today_scores or postseason_schedule."`
+	GamePk int `json:"game_pk" jsonschema:"MLB game PK (required). Obtain from scores or postseason_schedule."`
 }
 
 type recentTransactionsArgs struct {
@@ -172,17 +178,38 @@ type postseasonScheduleArgs struct {
 
 // --- tool handlers ---
 
-func (s *Server) toolTodayScores(
+func (s *Server) toolScores(
 	ctx context.Context,
 	_ *mcpsdk.CallToolRequest,
-	_ todayScoresArgs,
+	args scoresArgs,
 ) (*mcpsdk.CallToolResult, any, error) {
-	today := time.Now().UTC().Truncate(24 * time.Hour)
-	games, err := s.client.Schedule(ctx, mlb.ScheduleQuery{
-		On: today,
-	})
+	q := mlb.ScheduleQuery{}
+	if args.Team != 0 {
+		q.Team = mlb.TeamID(args.Team)
+	}
+	if args.From != "" && args.To != "" {
+		from, err := time.Parse("2006-01-02", args.From)
+		if err != nil {
+			return nil, nil, fmt.Errorf("mlb-mcp: scores: from must be YYYY-MM-DD: %w", err)
+		}
+		to, err := time.Parse("2006-01-02", args.To)
+		if err != nil {
+			return nil, nil, fmt.Errorf("mlb-mcp: scores: to must be YYYY-MM-DD: %w", err)
+		}
+		q.From = from
+		q.To = to
+	} else if args.Date != "" {
+		d, err := time.Parse("2006-01-02", args.Date)
+		if err != nil {
+			return nil, nil, fmt.Errorf("mlb-mcp: scores: date must be YYYY-MM-DD: %w", err)
+		}
+		q.On = d
+	} else {
+		q.On = time.Now().UTC().Truncate(24 * time.Hour)
+	}
+	games, err := s.client.Schedule(ctx, q)
 	if err != nil {
-		return nil, nil, fmt.Errorf("mlb-mcp: today_scores: %w", err)
+		return nil, nil, fmt.Errorf("mlb-mcp: scores: %w", err)
 	}
 	return textResult(jsonOrErr(games)), nil, nil
 }

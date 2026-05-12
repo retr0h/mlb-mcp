@@ -123,7 +123,7 @@ func TestServer_ListTools(t *testing.T) {
 	}
 
 	want := []string{
-		"today_scores",
+		"scores",
 		"standings",
 		"player_bio",
 		"team_info",
@@ -159,9 +159,9 @@ func TestServer_CallTool(t *testing.T) {
 		wantSubstrs []string // substrings expected in the first TextContent block
 		wantErr     bool     // true when we expect a non-nil error or isError result
 	}{
-		// ── today_scores ──────────────────────────────────────────────────────
+		// ── scores ──────────────────────────────────────────────────────
 		{
-			name: "today_scores-returns-two-games",
+			name: "scores-returns-two-games",
 			driver: &fakeDriver{
 				scheduleFn: func(_ context.Context, _ mlb.ScheduleQuery) ([]mlb.Game, error) {
 					return []mlb.Game{
@@ -180,7 +180,7 @@ func TestServer_CallTool(t *testing.T) {
 					}, nil
 				},
 			},
-			tool: "today_scores",
+			tool: "scores",
 			args: nil,
 			wantSubstrs: []string{
 				"745455",
@@ -193,13 +193,55 @@ func TestServer_CallTool(t *testing.T) {
 			},
 		},
 		{
-			name: "today_scores-driver-error-propagates",
+			name:        "scores-with-date",
+			driver:      &fakeDriver{},
+			tool:        "scores",
+			args:        map[string]any{"date": "2024-09-07"},
+			wantSubstrs: []string{},
+		},
+		{
+			name:        "scores-with-date-range",
+			driver:      &fakeDriver{},
+			tool:        "scores",
+			args:        map[string]any{"from": "2024-09-01", "to": "2024-09-07"},
+			wantSubstrs: []string{},
+		},
+		{
+			name:        "scores-with-team-filter",
+			driver:      &fakeDriver{},
+			tool:        "scores",
+			args:        map[string]any{"team_id": 119},
+			wantSubstrs: []string{},
+		},
+		{
+			name:    "scores-bad-date-rejects",
+			driver:  &fakeDriver{},
+			tool:    "scores",
+			args:    map[string]any{"date": "not-a-date"},
+			wantErr: true,
+		},
+		{
+			name:    "scores-bad-from-date-rejects",
+			driver:  &fakeDriver{},
+			tool:    "scores",
+			args:    map[string]any{"from": "bad", "to": "2024-09-07"},
+			wantErr: true,
+		},
+		{
+			name:    "scores-bad-to-date-rejects",
+			driver:  &fakeDriver{},
+			tool:    "scores",
+			args:    map[string]any{"from": "2024-09-01", "to": "bad"},
+			wantErr: true,
+		},
+		{
+			name: "scores-driver-error-propagates",
 			driver: &fakeDriver{
 				scheduleFn: func(_ context.Context, _ mlb.ScheduleQuery) ([]mlb.Game, error) {
 					return nil, errBoom
 				},
 			},
-			tool:    "today_scores",
+			tool:    "scores",
 			args:    nil,
 			wantErr: true,
 		},

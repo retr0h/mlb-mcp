@@ -122,7 +122,7 @@ required; all data is publicly available.
 
 ## Tools at a glance
 
-- today_scores       — who won today / today's scores and game status
+- scores              — scores and results for any date (defaults to today)
 - standings          — division standings for AL, NL, or both leagues
 - player_bio         — biographical info for a player by MLB person ID
 - team_info          — rich team metadata (venue, league, division) by team ID
@@ -139,7 +139,7 @@ required; all data is publicly available.
 - Team IDs: use MLB's canonical numeric IDs (e.g. 119 = Los Angeles Dodgers,
   147 = New York Yankees, 111 = Boston Red Sox).
 - Person IDs: use MLB's canonical numeric player IDs (e.g. 660271 = Shohei Ohtani).
-- Game PKs: the unique game identifier returned by today_scores and
+- Game PKs: the unique game identifier returned by scores and
   postseason_schedule; used by game_detail and game_linescore.
 - Stat categories for league_leaders: 'homeRuns', 'battingAverage',
   'strikeOuts', 'era', 'wins', 'saves', 'rbi', 'stolenBases'.
