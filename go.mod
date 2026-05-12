@@ -3,6 +3,7 @@ module github.com/retr0h/mlb-mcp
 go 1.25.7
 
 require (
+	github.com/caarlos0/go-version v0.2.2
 	github.com/dave/jennifer v1.7.1
 	github.com/getkin/kin-openapi v0.135.0
 	github.com/lmittmann/tint v1.1.3

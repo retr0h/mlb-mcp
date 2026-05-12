@@ -179,6 +179,12 @@ parameters derived from the embedded OpenAPI spec.
 See the [Development][] guide for prerequisites, setup, and conventions.
 See the [Contributing][] guide before submitting a PR.
 
+## 🔗 Related projects
+
+| Project | Description |
+| ------- | ----------- |
+| [mlb-sdk][] | Typed Go client for the MLB Stats API — the library this server wraps |
+
 ## ⚖️ Copyright notice
 
 This package and its author are not affiliated with MLB or any MLB team. This
