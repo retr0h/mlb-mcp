@@ -19,8 +19,8 @@ which agent is driving.
 - **Wraps mlb-sdk.** All MLB data access goes through
   `github.com/retr0h/mlb-sdk/pkg/mlb`. This project never calls the MLB
   Stats API directly.
-- **Skunkworks workflow.** Commits land directly on `main` and push
-  immediately. No feature branches, no PR workflow.
+- **PR workflow.** Feature branches + pull requests into `main`.
+  Branch protection is enabled; direct pushes to `main` are blocked.
 
 [mcp]: https://modelcontextprotocol.io
 
