@@ -53,4 +53,19 @@ type Driver interface {
 
 	// Linescore fetches the inning-by-inning linescore for a game.
 	Linescore(ctx context.Context, gamePk int, q mlb.LinescoreQuery) (*mlb.Linescore, error)
+
+	// Boxscore fetches the team-stats boxscore for a game by gamePk.
+	Boxscore(ctx context.Context, gamePk int) (*mlb.Boxscore, error)
+
+	// Roster fetches a team's roster filtered by the query.
+	Roster(ctx context.Context, teamID int, q mlb.RosterQuery) (*mlb.Roster, error)
+
+	// Transactions fetches roster/assignment transactions.
+	Transactions(ctx context.Context, q mlb.TransactionsQuery) (*mlb.Transactions, error)
+
+	// FreeAgents fetches free-agent declarations and signings.
+	FreeAgents(ctx context.Context, q mlb.FreeAgentsQuery) (*mlb.FreeAgents, error)
+
+	// SchedulePostseason fetches the postseason schedule.
+	SchedulePostseason(ctx context.Context, q mlb.SchedulePostseasonQuery) ([]mlb.Game, error)
 }

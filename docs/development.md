@@ -23,12 +23,19 @@ go test ./...
 ## Layout
 
 ```
-cmd/mlb-mcp/main.go   Entry point; starts the MCP server
+main.go                    Entry point; delegates to cmd.Execute()
+cmd/root.go                Cobra root command
+cmd/mcp.go                 mcp parent command
+cmd/mcp_start.go           mcp start — runs the MCP server over stdio
+internal/mcp/server.go     Server struct, Config, New(), Run()
+internal/mcp/session.go    Driver interface (consumer-side abstraction)
+internal/mcp/tools.go      Tool registration + handlers
+internal/mcp/json.go       JSON marshaling helper
 ```
 
-This is a binary project — `cmd/mlb-mcp/main.go` produces the `mlb-mcp`
-executable. All MLB data access goes through the mlb-sdk library; this
-project never calls `statsapi.mlb.com` directly.
+This is a binary project — `main.go` at the root produces the `mlb-mcp`
+executable. All MLB data access goes through the mlb-sdk library; this project
+never calls `statsapi.mlb.com` directly.
 
 ## Common tasks
 
@@ -49,28 +56,31 @@ just ready          # fmt + vet + lint
 
 ## Adding a new tool
 
-An MCP tool exposes one MLB Stats API call as a function an LLM can invoke.
-Each tool maps one-to-one onto a method on `mlb.Client`.
+An MCP tool answers a **user intent** in one call — not a bare SDK method. See
+`AGENTS.md § Tool design` for the design rules. Each tool calls 1–3 SDK methods
+internally and returns a complete answer.
 
 When adding a new tool, touch every one of these in order:
 
-1. **`cmd/mlb-mcp/main.go`** — register the new tool with the MCP server,
-   declaring its name, description, and input schema.
-2. **A handler file** (e.g. `internal/tools/<resource>.go`) — implement
-   the handler function: parse arguments, call the mlb-sdk method, marshal
-   the result to JSON, and return it as MCP tool output. Wrap errors as
-   `fmt.Errorf("mlb-mcp: <tool>: %w", err)`.
-3. **A test file** (`internal/tools/<resource>_test.go`) — one table-driven
-   test per handler, covering: happy path, empty/missing fields, mlb-sdk
-   error propagation, argument parse failure. Coverage must stay at 100.0%.
-4. **`README.md`** — add a row to the `## Tools` table.
-5. **`just ready`** — final gate. fmt + vet + lint + 100% coverage all
-   green before committing.
+1. **`internal/mcp/session.go`** — if the tool needs an SDK method not yet on
+   the `Driver` interface, add it. The concrete `*mlb.Client` must already
+   satisfy the new method structurally.
+2. **`internal/mcp/tools.go`** — register the tool via `mcpsdk.AddTool` in
+   `registerTools()`. Write the args struct (with `json` + `jsonschema` tags)
+   and handler func. Wrap errors as `fmt.Errorf("mlb-mcp: <tool>: %w", err)`.
+3. **`internal/mcp/tools_test.go`** — one table-driven test per handler,
+   covering: happy path, empty/missing required args, SDK error propagation. Use
+   a fake `Driver` implementation. Coverage must stay at 100.0%.
+4. **`internal/mcp/server.go`** — update the `instructions` const to mention the
+   new tool.
+5. **`README.md`** — add a row to the `## Tools` table.
+6. **`just ready`** — final gate. fmt + vet + lint + 100% coverage all green
+   before committing.
 
 ## Public surface authoring
 
-This project does not expose a Go library API. Its public surface is the set
-of MCP tools it registers and the JSON schemas those tools accept and return.
+This project does not expose a Go library API. Its public surface is the set of
+MCP tools it registers and the JSON schemas those tools accept and return.
 
 ### Error handling
 
@@ -93,36 +103,73 @@ func WithThing(v T) Option { return func(c *config) { c.thing = v } }
 
 ## Testing conventions
 
-**Every public function and method MUST have a table-driven test.** One
-table per function, with rows covering both the happy path and every failure
-mode the function can produce. Failure rows belong in the same table as the
-happy row — not in a separate test.
+**Every public function and method MUST have a table-driven test.** One table
+per function, with rows covering both the happy path and every failure mode the
+function can produce. Failure rows belong in the same table as the happy row —
+not in a separate test.
+
+> **Anti-pattern (do not do this):** writing a separate one-off test function
+> for a failure scenario. Each public function gets exactly **one** `Test*`
+> function in the codebase. Reviewers should reject PRs that introduce
+> additional one-off tests for the same function.
 
 ### File naming (non-negotiable)
 
-**One test file per production file.** `tools/schedule.go` is tested by
-`tools/schedule_test.go`. If tests outgrow one file, split the production
-file first.
+**One test file per production file.** `tools.go` is tested by `tools_test.go`.
+If tests outgrow one file, split the production file first.
+
+Two exceptions: shared fixtures in `helpers_test.go` / `fakes_test.go`, and
+`main_test.go` for `TestMain`.
 
 ### Table shape
 
+For tool handlers, each row injects a fake `Driver` and asserts on either the
+JSON result or the error:
+
 ```go
-func TestScheduleTool(t *testing.T) {
+func TestTodayScores(t *testing.T) {
     cases := []struct {
         name    string
-        args    map[string]any
-        want    string // JSON substring expected in output
-        wantErr string // error substring; "" means expect nil
+        driver  Driver       // fake implementation
+        wantErr string       // error substring; "" means expect nil
+        want    string       // JSON substring in result
     }{
-        {name: "happy path", args: map[string]any{"date": "2024-04-01"}, want: `"gamePk"`},
-        {name: "missing date", args: map[string]any{}, wantErr: "date"},
-        {name: "sdk error", args: map[string]any{"date": "bad"}, wantErr: "schedule"},
+        {name: "happy path", driver: fakeWithGames(2), want: `"gamePk"`},
+        {name: "sdk error", driver: fakeWithError(errBoom), wantErr: "today_scores"},
     }
     for _, c := range cases {
         t.Run(c.name, func(t *testing.T) { ... })
     }
 }
 ```
+
+### Required failure rows for tool handlers
+
+Every tool handler's table MUST include rows covering:
+
+| Row                  | Setup                                                          |
+| -------------------- | -------------------------------------------------------------- |
+| Happy path           | Fake Driver returns valid data                                 |
+| Missing required arg | Args struct missing a required field → expect validation error |
+| SDK error            | Fake Driver returns an error → expect wrapped error            |
+| Empty result         | Fake Driver returns empty data → expect graceful zero values   |
+
+### Branchy args need branch-per-row coverage
+
+When a handler conditionally sets query fields (`if args.Season != 0`), the
+happy-path row only exercises one branch. Add rows that exercise each branch so
+coverage stays at 100.0%.
+
+### Test naming
+
+- Tool handlers: `TestToolTodayScores`, `TestToolStandings`.
+- Pure functions: `TestFunctionName`.
+- Methods on a type: `TestType_Method`.
+
+### Coverage gate
+
+**Coverage is 100.0% of statements.** `main.go` is excluded via `.coverignore`.
+Run `just go::test` to confirm.
 
 ## Commit messages
 

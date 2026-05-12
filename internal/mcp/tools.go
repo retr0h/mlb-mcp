@@ -33,128 +33,156 @@ import (
 // registerTools wires every MLB MCP tool onto s.mcp.
 func (s *Server) registerTools() {
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
-		Name:        "schedule",
-		Description: "Fetch MLB game schedule. Filter by team ID, a single date (YYYY-MM-DD), or a date range. All filters are optional; omitting them returns the full league schedule for today.",
-	}, s.toolSchedule)
+		Name: "today_scores",
+		Description: "Use this when the user asks who won today, what are today's scores, " +
+			"or what games are being played today. Returns every MLB game scheduled for today " +
+			"with team names, scores, and game status (Final/Live/Scheduled).",
+	}, s.toolTodayScores)
 
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
-		Name:        "standings",
-		Description: "Fetch division standings for a league. league_id is required: 103 = American League, 104 = National League. Optionally filter by season year, standings type (e.g. regularSeason, wildCard), or a specific date.",
+		Name: "standings",
+		Description: "Use this when the user asks about standings, division standings, or " +
+			"how teams are doing in the standings. Fetches AL (103) and/or NL (104) standings " +
+			"with wins, losses, winning percentage, and games back. Optionally filter by " +
+			"league ('AL' or 'NL') and season year.",
 	}, s.toolStandings)
 
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
-		Name:        "person",
-		Description: "Fetch a single player or person by their MLB person ID (e.g. 660271 = Shohei Ohtani). Returns biographical info, primary position, bat side, and pitch hand.",
-	}, s.toolPerson)
+		Name: "player_bio",
+		Description: "Use this when the user asks about a specific player — 'tell me about " +
+			"Ohtani', 'who is Mike Trout', 'what position does Freddie Freeman play'. " +
+			"Returns full biographical info including position, bat side, pitch hand, " +
+			"height, weight, birth date, and active status. Requires the player's MLB person ID.",
+	}, s.toolPlayerBio)
 
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
-		Name:        "team",
-		Description: "Fetch team metadata by MLB team ID (e.g. 119 = Los Angeles Dodgers). Includes venue, league, division, and sport. Pass hydrate='league,division,sport,venue' to expand sub-objects beyond id/name/link.",
-	}, s.toolTeam)
+		Name: "team_info",
+		Description: "Use this when the user asks about a specific team — 'tell me about the " +
+			"Dodgers', 'where do the Yankees play', 'what league is Houston in'. Returns rich " +
+			"team metadata including venue, league, division, abbreviation, and founding year. " +
+			"Requires the team's MLB team ID (e.g. 119 = Los Angeles Dodgers).",
+	}, s.toolTeamInfo)
 
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
-		Name:        "stats_leaders",
-		Description: "Fetch league stat leaders. leader_categories is required (e.g. 'homeRuns', 'battingAverage', 'strikeOuts'). Optionally filter by season, sport_id (1=MLB), league_id, stat_group, player_pool, and limit.",
-	}, s.toolStatsLeaders)
+		Name: "team_roster",
+		Description: "Use this when the user asks who is on a team — 'who's on the Dodgers', " +
+			"'show me the Red Sox roster', 'list the Yankees players'. Returns the active " +
+			"roster with player names, jersey numbers, and positions. Requires the team's " +
+			"MLB team ID. Season defaults to the current year.",
+	}, s.toolTeamRoster)
 
 	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
-		Name:        "linescore",
-		Description: "Fetch the inning-by-inning linescore for a game by its gamePk. Returns per-inning runs/hits/errors for both teams, game totals, current count (balls/strikes/outs), and the active defense and offense lineups.",
-	}, s.toolLinescore)
+		Name: "league_leaders",
+		Description: "Use this when the user asks about stat leaders — 'who leads in home runs', " +
+			"'who has the best batting average', 'top ERA pitchers'. Requires a stat category " +
+			"(e.g. 'homeRuns', 'battingAverage', 'strikeOuts', 'era'). Season defaults to the " +
+			"current year. Limit defaults to 10.",
+	}, s.toolLeagueLeaders)
+
+	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
+		Name: "game_detail",
+		Description: "Use this when the user asks what happened in a specific game — 'what " +
+			"were the stats in game 745455', 'show me the boxscore'. Returns team batting and " +
+			"pitching stats for both home and away teams. Requires the game's MLB gamePk " +
+			"(obtainable from today_scores or postseason_schedule).",
+	}, s.toolGameDetail)
+
+	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
+		Name: "game_linescore",
+		Description: "Use this when the user asks for an inning-by-inning breakdown — 'show " +
+			"me the linescore for game X', 'what happened each inning'. Returns per-inning " +
+			"runs/hits/errors for both teams, game totals, and current count. Requires the " +
+			"game's MLB gamePk.",
+	}, s.toolGameLinescore)
+
+	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
+		Name: "recent_transactions",
+		Description: "Use this when the user asks about recent roster moves — 'any trades " +
+			"today', 'what moves happened this week', 'recent DFA transactions'. Returns " +
+			"signings, trades, designations, and other transactions. Days defaults to 1 " +
+			"(today). Optionally filter to a specific team by MLB team ID.",
+	}, s.toolRecentTransactions)
+
+	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
+		Name: "free_agents",
+		Description: "Use this when the user asks about free agents — 'who are the free " +
+			"agents', 'which players are unsigned', 'show me free agent signings'. Returns " +
+			"players who declared free agency with their original team, new team (if signed), " +
+			"and signing date. Season defaults to the current year.",
+	}, s.toolFreeAgents)
+
+	mcpsdk.AddTool(s.mcp, &mcpsdk.Tool{
+		Name: "postseason_schedule",
+		Description: "Use this when the user asks about the playoffs or postseason — 'what's " +
+			"the postseason schedule', 'when are the playoffs', 'show me the World Series games'. " +
+			"Returns all postseason games with teams, scores, and status. Season defaults to " +
+			"the current year.",
+	}, s.toolPostseasonSchedule)
 }
 
 // --- args structs ---
 
-// All date fields are YYYY-MM-DD strings; the handler converts them to
-// time.Time before forwarding to the SDK so the JSON schema stays
-// serialisable.
-
-type scheduleArgs struct {
-	TeamID string `json:"team_id,omitempty" jsonschema:"MLB team ID (integer), e.g. 119 for the Dodgers. Omit for all teams."`
-	On     string `json:"on,omitempty"      jsonschema:"Single date filter in YYYY-MM-DD format. Mutually exclusive with from/to."`
-	From   string `json:"from,omitempty"    jsonschema:"Start of date range in YYYY-MM-DD format. Requires 'to'."`
-	To     string `json:"to,omitempty"      jsonschema:"End of date range in YYYY-MM-DD format. Requires 'from'."`
-}
+// todayScoresArgs has no fields — today_scores always operates on today.
+type todayScoresArgs struct{}
 
 type standingsArgs struct {
-	LeagueID       int    `json:"league_id"                 jsonschema:"MLB league ID (required): 103 = American League, 104 = National League."`
-	Season         int    `json:"season,omitempty"          jsonschema:"Season year, e.g. 2026. Defaults to the current season."`
-	StandingsTypes string `json:"standings_types,omitempty" jsonschema:"Standings type: regularSeason, wildCard, divisionLeaders, etc."`
-	On             string `json:"on,omitempty"              jsonschema:"View standings as of this date (YYYY-MM-DD). Defaults to today."`
-	Hydrate        string `json:"hydrate,omitempty"         jsonschema:"Comma-separated hydrate string to expand sub-objects."`
+	League string `json:"league,omitempty" jsonschema:"Filter to a single league: 'AL' or 'NL'. Omit for both leagues."`
+	Season int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2026. Defaults to the current season."`
 }
 
-type personArgs struct {
-	PersonID int    `json:"person_id"         jsonschema:"MLB person ID (required), e.g. 660271 for Shohei Ohtani."`
-	Hydrate  string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate string, e.g. 'stats'."`
-	Fields   string `json:"fields,omitempty"  jsonschema:"Comma-separated field projection to restrict the response."`
+type playerBioArgs struct {
+	PersonID int `json:"person_id" jsonschema:"MLB person ID (required), e.g. 660271 for Shohei Ohtani."`
 }
 
-type teamArgs struct {
-	TeamID  int    `json:"team_id"           jsonschema:"MLB team ID (required), e.g. 119 for the Los Angeles Dodgers."`
-	Season  int    `json:"season,omitempty"  jsonschema:"Season year, e.g. 2026. Constrains metadata to that season."`
-	Hydrate string `json:"hydrate,omitempty" jsonschema:"Comma-separated hydrate string, e.g. 'league,division,sport,venue'."`
-	Fields  string `json:"fields,omitempty"  jsonschema:"Comma-separated field projection to restrict the response."`
+type teamInfoArgs struct {
+	TeamID int `json:"team_id" jsonschema:"MLB team ID (required), e.g. 119 for the Los Angeles Dodgers."`
 }
 
-type statsLeadersArgs struct {
-	LeaderCategories string `json:"leader_categories"           jsonschema:"Stat category (required), e.g. 'homeRuns', 'battingAverage', 'strikeOuts'."`
-	Season           int    `json:"season,omitempty"            jsonschema:"Season year, e.g. 2026. Defaults to current season."`
-	SportID          int    `json:"sport_id,omitempty"          jsonschema:"Sport ID: 1 = MLB. Defaults to MLB."`
-	LeagueID         int    `json:"league_id,omitempty"         jsonschema:"MLB league ID: 103 = AL, 104 = NL. Omit for both leagues."`
-	StatGroup        string `json:"stat_group,omitempty"        jsonschema:"Stat group: hitting, pitching, fielding, catching."`
-	PlayerPool       string `json:"player_pool,omitempty"       jsonschema:"Player pool: All, Qualified, Rookies."`
-	LeaderGameTypes  string `json:"leader_game_types,omitempty" jsonschema:"Game type filter, e.g. 'R' for regular season."`
-	StatType         string `json:"stat_type,omitempty"         jsonschema:"Stat type override."`
-	Hydrate          string `json:"hydrate,omitempty"           jsonschema:"Comma-separated hydrate string."`
-	Limit            int    `json:"limit,omitempty"             jsonschema:"Maximum number of leaders to return per category. Defaults to API default."`
-	Fields           string `json:"fields,omitempty"            jsonschema:"Comma-separated field projection to restrict the response."`
+type teamRosterArgs struct {
+	TeamID int `json:"team_id"          jsonschema:"MLB team ID (required), e.g. 119 for the Los Angeles Dodgers."`
+	Season int `json:"season,omitempty" jsonschema:"Season year, e.g. 2026. Defaults to the current year."`
 }
 
-type linescoreArgs struct {
-	GamePk   int    `json:"game_pk"            jsonschema:"MLB game PK (required). Obtain from the schedule tool."`
-	Timecode string `json:"timecode,omitempty" jsonschema:"Point-in-time timecode YYYYMMDD_HHmmss for historical linescores."`
-	Fields   string `json:"fields,omitempty"   jsonschema:"Comma-separated field projection to restrict the response."`
+type leagueLeadersArgs struct {
+	Category string `json:"category"         jsonschema:"Stat category (required), e.g. 'homeRuns', 'battingAverage', 'strikeOuts', 'era'."`
+	Season   int    `json:"season,omitempty" jsonschema:"Season year, e.g. 2026. Defaults to the current season."`
+	Limit    int    `json:"limit,omitempty"  jsonschema:"Number of leaders to return. Defaults to 10."`
+}
+
+type gameDetailArgs struct {
+	GamePk int `json:"game_pk" jsonschema:"MLB game PK (required). Obtain from today_scores or postseason_schedule."`
+}
+
+type gameLinescoreArgs struct {
+	GamePk int `json:"game_pk" jsonschema:"MLB game PK (required). Obtain from today_scores or postseason_schedule."`
+}
+
+type recentTransactionsArgs struct {
+	Days   int `json:"days,omitempty"    jsonschema:"Number of days to look back (and forward) from today. Defaults to 1."`
+	TeamID int `json:"team_id,omitempty" jsonschema:"Filter to a single MLB team ID, e.g. 119 for the Dodgers. Omit for all teams."`
+}
+
+type freeAgentsArgs struct {
+	Season int `json:"season,omitempty" jsonschema:"Season year, e.g. 2026. Defaults to the current year."`
+}
+
+type postseasonScheduleArgs struct {
+	Season int `json:"season,omitempty" jsonschema:"Season year, e.g. 2026. Defaults to the current year."`
 }
 
 // --- tool handlers ---
 
-func (s *Server) toolSchedule(
+func (s *Server) toolTodayScores(
 	ctx context.Context,
 	_ *mcpsdk.CallToolRequest,
-	args scheduleArgs,
+	_ todayScoresArgs,
 ) (*mcpsdk.CallToolResult, any, error) {
-	q := mlb.ScheduleQuery{}
-	if args.TeamID != "" {
-		var id int
-		if _, err := fmt.Sscanf(args.TeamID, "%d", &id); err != nil {
-			return nil, nil, fmt.Errorf("mlb-mcp: schedule: team_id must be an integer: %w", err)
-		}
-		q.Team = mlb.TeamID(id)
-	}
-	if args.On != "" {
-		t, err := time.Parse("2006-01-02", args.On)
-		if err != nil {
-			return nil, nil, fmt.Errorf("mlb-mcp: schedule: on must be YYYY-MM-DD: %w", err)
-		}
-		q.On = t
-	}
-	if args.From != "" && args.To != "" {
-		from, err := time.Parse("2006-01-02", args.From)
-		if err != nil {
-			return nil, nil, fmt.Errorf("mlb-mcp: schedule: from must be YYYY-MM-DD: %w", err)
-		}
-		to, err := time.Parse("2006-01-02", args.To)
-		if err != nil {
-			return nil, nil, fmt.Errorf("mlb-mcp: schedule: to must be YYYY-MM-DD: %w", err)
-		}
-		q.From = from
-		q.To = to
-	}
-
-	games, err := s.client.Schedule(ctx, q)
+	today := time.Now().UTC().Truncate(24 * time.Hour)
+	games, err := s.client.Schedule(ctx, mlb.ScheduleQuery{
+		On: today,
+	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("mlb-mcp: schedule: %w", err)
+		return nil, nil, fmt.Errorf("mlb-mcp: today_scores: %w", err)
 	}
 	return textResult(jsonOrErr(games)), nil, nil
 }
@@ -164,99 +192,198 @@ func (s *Server) toolStandings(
 	_ *mcpsdk.CallToolRequest,
 	args standingsArgs,
 ) (*mcpsdk.CallToolResult, any, error) {
-	q := mlb.StandingsQuery{
-		League:         mlb.LeagueID(args.LeagueID),
-		Season:         args.Season,
-		StandingsTypes: args.StandingsTypes,
-		Hydrate:        args.Hydrate,
-	}
-	if args.On != "" {
-		t, err := time.Parse("2006-01-02", args.On)
-		if err != nil {
-			return nil, nil, fmt.Errorf("mlb-mcp: standings: on must be YYYY-MM-DD: %w", err)
-		}
-		q.On = t
+	type leagueFetch struct {
+		id   mlb.LeagueID
+		name string
 	}
 
-	st, err := s.client.Standings(ctx, q)
-	if err != nil {
-		return nil, nil, fmt.Errorf("mlb-mcp: standings: %w", err)
+	fetches := []leagueFetch{
+		{id: 103, name: "AL"},
+		{id: 104, name: "NL"},
 	}
-	return textResult(jsonOrErr(st)), nil, nil
+
+	switch args.League {
+	case "AL":
+		fetches = []leagueFetch{{id: 103, name: "AL"}}
+	case "NL":
+		fetches = []leagueFetch{{id: 104, name: "NL"}}
+	}
+
+	type leagueStandings struct {
+		League    string         `json:"league"`
+		Standings *mlb.Standings `json:"standings"`
+	}
+
+	results := make([]leagueStandings, 0, len(fetches))
+	for _, f := range fetches {
+		st, err := s.client.Standings(ctx, mlb.StandingsQuery{
+			League: f.id,
+			Season: args.Season,
+		})
+		if err != nil {
+			return nil, nil, fmt.Errorf("mlb-mcp: standings: %w", err)
+		}
+		results = append(results, leagueStandings{League: f.name, Standings: st})
+	}
+	return textResult(jsonOrErr(results)), nil, nil
 }
 
-func (s *Server) toolPerson(
+func (s *Server) toolPlayerBio(
 	ctx context.Context,
 	_ *mcpsdk.CallToolRequest,
-	args personArgs,
+	args playerBioArgs,
 ) (*mcpsdk.CallToolResult, any, error) {
-	q := mlb.PersonQuery{
-		Hydrate: args.Hydrate,
-		Fields:  args.Fields,
-	}
-	p, err := s.client.Person(ctx, args.PersonID, q)
+	p, err := s.client.Person(ctx, args.PersonID, mlb.PersonQuery{})
 	if err != nil {
-		return nil, nil, fmt.Errorf("mlb-mcp: person: %w", err)
+		return nil, nil, fmt.Errorf("mlb-mcp: player_bio: %w", err)
 	}
 	return textResult(jsonOrErr(p)), nil, nil
 }
 
-func (s *Server) toolTeam(
+func (s *Server) toolTeamInfo(
 	ctx context.Context,
 	_ *mcpsdk.CallToolRequest,
-	args teamArgs,
+	args teamInfoArgs,
 ) (*mcpsdk.CallToolResult, any, error) {
-	q := mlb.TeamQuery{
-		Season:  args.Season,
-		Hydrate: args.Hydrate,
-		Fields:  args.Fields,
-	}
-	t, err := s.client.Team(ctx, args.TeamID, q)
+	t, err := s.client.Team(ctx, args.TeamID, mlb.TeamQuery{
+		Hydrate: "league,division,sport,venue",
+	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("mlb-mcp: team: %w", err)
+		return nil, nil, fmt.Errorf("mlb-mcp: team_info: %w", err)
 	}
 	return textResult(jsonOrErr(t)), nil, nil
 }
 
-func (s *Server) toolStatsLeaders(
+func (s *Server) toolTeamRoster(
 	ctx context.Context,
 	_ *mcpsdk.CallToolRequest,
-	args statsLeadersArgs,
+	args teamRosterArgs,
 ) (*mcpsdk.CallToolResult, any, error) {
-	q := mlb.StatsLeadersQuery{
-		LeaderCategories: args.LeaderCategories,
-		Season:           args.Season,
-		SportID:          args.SportID,
-		LeagueID:         args.LeagueID,
-		StatGroup:        args.StatGroup,
-		PlayerPool:       args.PlayerPool,
-		LeaderGameTypes:  args.LeaderGameTypes,
-		StatType:         args.StatType,
-		Hydrate:          args.Hydrate,
-		Limit:            args.Limit,
-		Fields:           args.Fields,
+	season := args.Season
+	if season == 0 {
+		season = time.Now().Year()
 	}
-	sl, err := s.client.StatsLeaders(ctx, q)
+	r, err := s.client.Roster(ctx, args.TeamID, mlb.RosterQuery{
+		RosterType: "active",
+		Season:     season,
+	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("mlb-mcp: stats_leaders: %w", err)
+		return nil, nil, fmt.Errorf("mlb-mcp: team_roster: %w", err)
+	}
+	return textResult(jsonOrErr(r)), nil, nil
+}
+
+func (s *Server) toolLeagueLeaders(
+	ctx context.Context,
+	_ *mcpsdk.CallToolRequest,
+	args leagueLeadersArgs,
+) (*mcpsdk.CallToolResult, any, error) {
+	limit := args.Limit
+	if limit == 0 {
+		limit = 10
+	}
+	sl, err := s.client.StatsLeaders(ctx, mlb.StatsLeadersQuery{
+		LeaderCategories: args.Category,
+		Season:           args.Season,
+		SportID:          1,
+		Limit:            limit,
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("mlb-mcp: league_leaders: %w", err)
 	}
 	return textResult(jsonOrErr(sl)), nil, nil
 }
 
-func (s *Server) toolLinescore(
+func (s *Server) toolGameDetail(
 	ctx context.Context,
 	_ *mcpsdk.CallToolRequest,
-	args linescoreArgs,
+	args gameDetailArgs,
 ) (*mcpsdk.CallToolResult, any, error) {
-	q := mlb.LinescoreQuery{
-		Timecode: args.Timecode,
-		Fields:   args.Fields,
-	}
-	ls, err := s.client.Linescore(ctx, args.GamePk, q)
+	bs, err := s.client.Boxscore(ctx, args.GamePk)
 	if err != nil {
-		return nil, nil, fmt.Errorf("mlb-mcp: linescore: %w", err)
+		return nil, nil, fmt.Errorf("mlb-mcp: game_detail: %w", err)
+	}
+	return textResult(jsonOrErr(bs)), nil, nil
+}
+
+func (s *Server) toolGameLinescore(
+	ctx context.Context,
+	_ *mcpsdk.CallToolRequest,
+	args gameLinescoreArgs,
+) (*mcpsdk.CallToolResult, any, error) {
+	ls, err := s.client.Linescore(ctx, args.GamePk, mlb.LinescoreQuery{})
+	if err != nil {
+		return nil, nil, fmt.Errorf("mlb-mcp: game_linescore: %w", err)
 	}
 	return textResult(jsonOrErr(ls)), nil, nil
+}
+
+func (s *Server) toolRecentTransactions(
+	ctx context.Context,
+	_ *mcpsdk.CallToolRequest,
+	args recentTransactionsArgs,
+) (*mcpsdk.CallToolResult, any, error) {
+	days := args.Days
+	if days == 0 {
+		days = 1
+	}
+
+	now := time.Now().UTC().Truncate(24 * time.Hour)
+	start := now.AddDate(0, 0, -(days - 1))
+	end := now
+
+	q := mlb.TransactionsQuery{
+		StartDate: start,
+		EndDate:   end,
+	}
+	if args.TeamID != 0 {
+		// When a team is specified, use TeamID alone (valid per SDK validation).
+		q = mlb.TransactionsQuery{
+			TeamID: args.TeamID,
+		}
+	}
+
+	tx, err := s.client.Transactions(ctx, q)
+	if err != nil {
+		return nil, nil, fmt.Errorf("mlb-mcp: recent_transactions: %w", err)
+	}
+	return textResult(jsonOrErr(tx)), nil, nil
+}
+
+func (s *Server) toolFreeAgents(
+	ctx context.Context,
+	_ *mcpsdk.CallToolRequest,
+	args freeAgentsArgs,
+) (*mcpsdk.CallToolResult, any, error) {
+	season := args.Season
+	if season == 0 {
+		season = time.Now().Year()
+	}
+	fa, err := s.client.FreeAgents(ctx, mlb.FreeAgentsQuery{
+		Season: season,
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("mlb-mcp: free_agents: %w", err)
+	}
+	return textResult(jsonOrErr(fa)), nil, nil
+}
+
+func (s *Server) toolPostseasonSchedule(
+	ctx context.Context,
+	_ *mcpsdk.CallToolRequest,
+	args postseasonScheduleArgs,
+) (*mcpsdk.CallToolResult, any, error) {
+	season := args.Season
+	if season == 0 {
+		season = time.Now().Year()
+	}
+	games, err := s.client.SchedulePostseason(ctx, mlb.SchedulePostseasonQuery{
+		Season: season,
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("mlb-mcp: postseason_schedule: %w", err)
+	}
+	return textResult(jsonOrErr(games)), nil, nil
 }
 
 // --- helpers ---

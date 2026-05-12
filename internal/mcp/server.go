@@ -110,23 +110,31 @@ func (s *Server) Run(ctx context.Context) error {
 // what the server can do without paging through every tool's description.
 const instructions = `mlb-mcp — MLB Stats API over MCP.
 
-This server exposes MLB's public Stats API as MCP tools. No authentication
-is required; all data is publicly available.
+This server exposes MLB's public Stats API as composable, intent-focused
+tools. Each tool answers one user question directly. No authentication is
+required; all data is publicly available.
 
-## Getting started
+## Tools at a glance
 
-1. Call schedule to fetch today's games or filter by team and date.
-2. Call standings to see division standings for AL (103) or NL (104).
-3. Call person to look up a player by their MLB person ID.
-4. Call team to retrieve team metadata including venue, league, and division.
-5. Call stats_leaders to find the current or historical stat leaders.
-6. Call linescore to get the inning-by-inning breakdown for a specific game.
+- today_scores       — who won today / today's scores and game status
+- standings          — division standings for AL, NL, or both leagues
+- player_bio         — biographical info for a player by MLB person ID
+- team_info          — rich team metadata (venue, league, division) by team ID
+- team_roster        — active roster for a team by team ID
+- league_leaders     — top players in a stat category (HR, AVG, ERA, …)
+- game_detail        — boxscore (team batting/pitching stats) for a gamePk
+- game_linescore     — inning-by-inning line for a gamePk
+- recent_transactions — recent signings, trades, DFAs; defaults to today
+- free_agents        — free-agent declarations and signings for a season
+- postseason_schedule — postseason game schedule for a season
 
 ## Key concepts
 
-- League IDs: 103 = American League, 104 = National League.
-- Team IDs: use MLB's canonical numeric IDs (e.g. 119 = Los Angeles Dodgers).
+- Team IDs: use MLB's canonical numeric IDs (e.g. 119 = Los Angeles Dodgers,
+  147 = New York Yankees, 111 = Boston Red Sox).
 - Person IDs: use MLB's canonical numeric player IDs (e.g. 660271 = Shohei Ohtani).
-- Game PKs: the unique game identifier returned by schedule; used by linescore.
-- Dates: YYYY-MM-DD format for all date parameters.
-- Hydrate: a comma-separated string to expand sub-objects (e.g. "league,division").`
+- Game PKs: the unique game identifier returned by today_scores and
+  postseason_schedule; used by game_detail and game_linescore.
+- Stat categories for league_leaders: 'homeRuns', 'battingAverage',
+  'strikeOuts', 'era', 'wins', 'saves', 'rbi', 'stolenBases'.
+- Season: all season-bearing tools default to the current year when omitted.`

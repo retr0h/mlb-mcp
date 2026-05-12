@@ -12,7 +12,7 @@ which agent is driving.
 
 ## Project shape
 
-- **Binary project.** Has `cmd/mlb-mcp/main.go`. Produces the `mlb-mcp`
+- **Binary project.** Has `main.go` at the root. Produces the `mlb-mcp`
   executable.
 - **MCP server.** Implements the [Model Context Protocol][mcp] so LLMs can
   call MLB Stats API endpoints as tools.
@@ -41,6 +41,26 @@ which agent is driving.
 3. **Coverage is 100.0% of statements.** A change that drops coverage is a
    regression and must be brought back to 100% before commit.
 4. **`just ready` is the gate before committing.** Runs fmt, vet, and lint.
+
+## Tool design
+
+Tools are composable answers, not raw endpoint wrappers. Each tool
+should answer a user question in one call — "who won today", "show me
+Ohtani's stats", "what are the standings" — not expose a bare SDK
+method.
+
+1. **One tool = one user intent.** If the user has to call two tools
+   to get an answer, merge them into one tool that does both calls.
+2. **10–20 tools max.** LLMs pick the right tool faster with fewer
+   choices. Prefer fewer, richer tools over many thin ones.
+3. **Tools call 1–3 SDK methods internally.** The composition logic
+   (filter today's games, enrich with scores, etc.) lives in the
+   handler, not in the LLM's reasoning.
+4. **Return complete answers.** Format results so the LLM can relay
+   them directly — don't return raw IDs that need a follow-up lookup.
+5. **Name tools as user intents.** `today_scores` not `get_schedule`.
+   `player_bio` not `get_person`. The name tells the LLM when to
+   pick it.
 
 ## Commit messages
 

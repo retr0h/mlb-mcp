@@ -2,7 +2,7 @@
   "mcpServers": {
     "mlb-mcp": {
       "command": "go",
-      "args": ["run", "github.com/retr0h/mlb-mcp/cmd/mlb-mcp", "mcp", "start"],
+      "args": ["run", "github.com/retr0h/mlb-mcp", "mcp", "start"],
       "env": {}
     }
   }
