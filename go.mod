@@ -8,7 +8,7 @@ require (
 	github.com/getkin/kin-openapi v0.135.0
 	github.com/lmittmann/tint v1.1.3
 	github.com/modelcontextprotocol/go-sdk v1.6.0
-	github.com/retr0h/mlb-sdk v0.0.0
+	github.com/retr0h/mlb-sdk v0.0.0-20260512214943-a277caace0e3
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	golang.org/x/term v0.43.0
@@ -246,8 +246,6 @@ require (
 	mvdan.cc/gofumpt v0.10.0 // indirect
 	mvdan.cc/unparam v0.0.0-20251027182757-5beb8c8f8f15 // indirect
 )
-
-replace github.com/retr0h/mlb-sdk => ../mlb-sdk
 
 tool (
 	github.com/golangci/golangci-lint/v2/cmd/golangci-lint

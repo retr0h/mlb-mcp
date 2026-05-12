@@ -30,9 +30,9 @@
   },
   "repos": [
     {
-      "name": "mlb-sdk",
-      "description": "⚾ Idiomatic Go SDK and CLI for the MLB Stats API.",
-      "topics": ["mlb", "baseball", "sports", "go", "golang", "sdk", "cli", "openapi", "oapi-codegen", "stats", "statsapi"]
+      "name": "mlb-mcp",
+      "description": "⚾ MCP server exposing the MLB Stats API as tools for LLMs.",
+      "topics": ["mlb", "baseball", "sports", "go", "golang", "mcp", "model-context-protocol", "llm", "statsapi"]
     }
   ]
 }
