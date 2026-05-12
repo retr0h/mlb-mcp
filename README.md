@@ -20,7 +20,20 @@ directly. No API key required — MLB's Stats API is public.
 ## 📦 Install
 
 ```bash
-go install github.com/retr0h/mlb-mcp@latest
+curl -fsSL https://github.com/retr0h/mlb-mcp/raw/main/install.sh | sh
+```
+
+Installs to `~/.local/bin` (or `/usr/local/bin` as root) — SHA256 checksums
+verified. Override with `MLB_MCP_INSTALL_DIR=/some/path` or pin a version
+with `MLB_MCP_VERSION=1.0.0`.
+
+### 🔨 Build from source
+
+```bash
+git clone https://github.com/retr0h/mlb-mcp.git
+cd mlb-mcp
+go build -o mlb-mcp .
+install -m 755 mlb-mcp ~/.local/bin/mlb-mcp
 ```
 
 ## 🚀 Usage
