@@ -6,6 +6,7 @@
 package cmd
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 	"strings"
@@ -13,6 +14,8 @@ import (
 
 	"github.com/lmittmann/tint"
 	"github.com/spf13/cobra"
+
+	"github.com/retr0h/mlb-mcp/internal/cli"
 	"github.com/spf13/viper"
 	"golang.org/x/term"
 )
@@ -47,6 +50,18 @@ Run the MCP server over stdio:
 // the help-text dump on runtime failures where it would just be noise.
 func Execute() {
 	rootCmd.SilenceUsage = true
+
+	defaultHelp := rootCmd.HelpFunc()
+	rootCmd.SetHelpFunc(func(c *cobra.Command, args []string) {
+		if c == rootCmd {
+			out := c.OutOrStdout()
+			_, _ = fmt.Fprintln(out)
+			_, _ = fmt.Fprint(out, cli.Banner(out))
+			_, _ = fmt.Fprintln(out)
+		}
+		defaultHelp(c, args)
+	})
+
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
