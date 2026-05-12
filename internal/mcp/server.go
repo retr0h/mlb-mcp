@@ -48,8 +48,11 @@ const version = "0.1.0"
 // Config bundles the runtime inputs for the mlb-mcp MCP server. Logger is
 // for the server's own diagnostic chatter — never written to stdout, which
 // belongs to the JSON-RPC wire. No auth is required; MLB's Stats API is public.
+// Driver is optional — when nil, New() creates a real mlb.Client; tests
+// inject a fake here.
 type Config struct {
 	Logger *slog.Logger
+	Driver Driver
 }
 
 // Server is the mlb-mcp MCP server. Holds a Driver (the narrow consumer
@@ -73,7 +76,10 @@ func New(cfg Config) *Server {
 		cfg.Logger = slog.New(slog.NewTextHandler(os.Stderr, nil))
 	}
 
-	var client Driver = mlb.New()
+	client := cfg.Driver
+	if client == nil {
+		client = mlb.New()
+	}
 
 	mcpSrv := mcpsdk.NewServer(
 		&mcpsdk.Implementation{
