@@ -18,16 +18,17 @@ const (
 	bot = "█░▀░█ █▄▄ █▄█   █░▀░█ █▄▄ █▀▀"
 )
 
-// Banner returns the two-line block-text banner in MLB blue (#002D72).
-// Falls back to uncolored text when the writer is not a TTY.
+// Banner returns the two-line block-text banner. Top line is faint/muted,
+// bottom line is MLB blue (#002D72) — matching the glitched-out split-color
+// style used by meshx, grind, kvlt, and tlock.
 func Banner(w io.Writer) string {
 	if !isTTY(w) {
 		return top + "\n" + bot + "\n"
 	}
-	// MLB blue: RGB(0, 45, 114) = #002D72
+	muted := "\033[0;2m"
 	blue := "\033[38;2;0;45;114m"
 	reset := "\033[0m"
-	return fmt.Sprintf("%s%s%s\n%s%s%s\n", blue, top, reset, blue, bot, reset)
+	return fmt.Sprintf("%s%s%s\n%s%s%s\n", muted, top, reset, blue, bot, reset)
 }
 
 func isTTY(w io.Writer) bool {
