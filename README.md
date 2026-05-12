@@ -4,25 +4,26 @@
 [![conventional commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=for-the-badge)](https://conventionalcommits.org)
 [![built with just](https://img.shields.io/badge/Built_with-Just-black?style=for-the-badge&logo=just&logoColor=white)](https://just.systems)
 ![github commit activity](https://img.shields.io/github/commit-activity/m/retr0h/mlb-mcp?style=for-the-badge)
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white&style=for-the-badge)](https://pkg.go.dev/github.com/retr0h/mlb-mcp)
 [![MLB](https://img.shields.io/badge/MLB-002D72?style=for-the-badge&logo=mlb&logoColor=white)](https://mlb.com)
 
 # mlb-mcp
 
-MCP server for the MLB Stats API.
+⚾ MCP server for the MLB Stats API.
 
 [Model Context Protocol (MCP)][mcp] is an open standard that lets LLMs
 call external tools and data sources in a structured, type-safe way. This
 server wraps the [mlb-sdk][] Go library and exposes MLB Stats API endpoints
 as MCP tools that any MCP-compatible LLM (Claude, GPT-4, etc.) can call
-directly.
+directly. No API key required — MLB's Stats API is public.
 
-## Install
+## 📦 Install
 
 ```bash
 go install github.com/retr0h/mlb-mcp@latest
 ```
 
-## Usage
+## 🚀 Usage
 
 Run the MCP server over stdio:
 
@@ -32,8 +33,8 @@ mlb-mcp mcp start
 
 ### Claude Code
 
-This repo ships a `.mcp.json` that Claude Code auto-discovers when
-your working directory is the repo root. Clone and open:
+This repo ships a [`.mcp.json`](.mcp.json) that Claude Code auto-discovers
+when your working directory is the repo root. Clone and open:
 
 ```bash
 git clone https://github.com/retr0h/mlb-mcp.git
@@ -59,10 +60,9 @@ Add to `claude_desktop_config.json`:
 ### Other MCP clients
 
 Any client that supports stdio transport can launch `mlb-mcp mcp start` as
-a subprocess. See [`.mcp.json`](.mcp.json) for the canonical
-config.
+a subprocess. See [`.mcp.json`](.mcp.json) for the canonical config.
 
-## Tools
+## ⚙️ Tools
 
 The server exposes **65 tools** in two tiers. Prefer the composed tools for
 common questions; the raw tools cover everything else.
@@ -156,13 +156,28 @@ new endpoint is added to mlb-sdk, regenerating picks it up automatically.
 
 </details>
 
-## Features
+## ✨ Features
 
-| Feature           | Description                                               |
-| ----------------- | --------------------------------------------------------- |
-| MCP stdio server  | Works with any MCP-compatible client out of the box       |
-| Typed responses   | All MLB data surfaced as structured JSON via mlb-sdk      |
-| Idiomatic Go      | Functional options, context propagation, wrapped errors   |
+| Feature              | Description                                               |
+| -------------------- | --------------------------------------------------------- |
+| MCP stdio server     | Works with any MCP-compatible client out of the box       |
+| Two-tier tools       | 11 composed (intent-focused) + 54 auto-generated (raw)    |
+| Auto-generated       | `mcpgen` reads the mlb-sdk OpenAPI spec at build time     |
+| Typed responses      | Composed tools return structured JSON via [mlb-sdk][]     |
+| Full API coverage    | Every MLB Stats API endpoint is available as a tool       |
+| Idiomatic Go         | Cobra CLI, functional options, context propagation        |
+
+## 💡 How it works
+
+This server wraps the [mlb-sdk][] Go library, which in turn wraps MLB's
+public Stats API (`statsapi.mlb.com`). The composed tools call the typed
+SDK through a `Driver` interface; the raw tools call the API directly with
+parameters derived from the embedded OpenAPI spec.
+
+## 📖 Documentation
+
+See the [Development][] guide for prerequisites, setup, and conventions.
+See the [Contributing][] guide before submitting a PR.
 
 ## ⚖️ Copyright notice
 
@@ -171,7 +186,7 @@ module is a typed Go client for MLB's public Stats API. Use of MLB data is
 subject to the notice posted at
 <http://gdx.mlb.com/components/copyright.txt>.
 
-## License
+## 📄 License
 
 The [MIT][] License.
 
