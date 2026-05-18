@@ -16,14 +16,14 @@ jobs:
         uses: actions/setup-go@v6
         with:
           go-version: stable
+      - name: Install just
+        uses: extractions/setup-just@v4
+      - name: Fetch justfiles
+        run: just fetch
       - name: Build
         run: go build ./...
       - name: Test
-        run: go test ./...
-      - name: Vet
-        run: go vet ./...
-      - name: Coverage
-        run: go test -race -coverprofile=coverage.out ./...
+        run: just test
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v6
         env:
