@@ -11,7 +11,7 @@ require (
 	github.com/retr0h/mlb-sdk v0.0.0-20260512221530-9dbe87dd8cfe
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
-	golang.org/x/term v0.43.0
+	golang.org/x/term v0.45.0
 )
 
 require (
@@ -238,7 +238,7 @@ require (
 	golang.org/x/mod v0.35.0 // indirect
 	golang.org/x/oauth2 v0.35.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/sys v0.47.0 // indirect
 	golang.org/x/text v0.36.0 // indirect
 	golang.org/x/tools v0.44.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
