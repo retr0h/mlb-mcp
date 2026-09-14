@@ -85,7 +85,7 @@ methods internally and returns a complete answer.
 
 ### Adding a raw tool (auto-generated from OpenAPI spec)
 
-When a new endpoint is added to [mlb-sdk][]'s OpenAPI spec, run:
+When a new endpoint is added to [mlb-sdk]'s OpenAPI spec, run:
 
 ```bash
 go generate ./internal/mcp/
@@ -95,8 +95,6 @@ The `mcpgen` tool reads the embedded spec from `mlb-sdk/pkg/api`, generates
 typed args structs and HTTP handlers for every non-composed operation, and
 writes `internal/mcp/tools_gen.go`. Update the raw tools table in `README.md` to
 match.
-
-[mlb-sdk]: https://github.com/retr0h/mlb-sdk
 
 ## Public surface authoring
 
@@ -190,7 +188,7 @@ coverage stays at 100.0%.
 ### Coverage gate
 
 **Coverage is 100.0% of statements.** `main.go` is excluded via `.coverignore`.
-Run `just go::test` to confirm.
+Run `just go-test` to confirm.
 
 ## Commit messages
 
@@ -201,3 +199,5 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 - **Format**: `type(scope): description`
 - **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `chore`
 - **Scopes**: `cmd`, `mcp`, `docs`
+
+[mlb-sdk]: https://github.com/retr0h/mlb-sdk
