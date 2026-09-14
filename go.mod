@@ -7,7 +7,7 @@ require (
 	github.com/dave/jennifer v1.7.1
 	github.com/getkin/kin-openapi v0.144.0
 	github.com/lmittmann/tint v1.1.3
-	github.com/modelcontextprotocol/go-sdk v1.6.0
+	github.com/modelcontextprotocol/go-sdk v1.7.0
 	github.com/retr0h/mlb-sdk v0.0.0-20260512221530-9dbe87dd8cfe
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
@@ -235,6 +235,7 @@ require (
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 	golang.org/x/text v0.40.0 // indirect
+	golang.org/x/time v0.15.0 // indirect
 	golang.org/x/tools v0.49.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
