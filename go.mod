@@ -11,7 +11,7 @@ require (
 	github.com/retr0h/mlb-sdk v0.0.0-20260512221530-9dbe87dd8cfe
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
-	golang.org/x/term v0.46.0
+	golang.org/x/term v0.47.0
 )
 
 require (
