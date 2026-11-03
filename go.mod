@@ -7,7 +7,7 @@ require (
 	github.com/dave/jennifer v1.7.1
 	github.com/getkin/kin-openapi v0.149.0
 	github.com/lmittmann/tint v1.2.0
-	github.com/modelcontextprotocol/go-sdk v1.7.0
+	github.com/modelcontextprotocol/go-sdk v1.8.0
 	github.com/retr0h/mlb-sdk v0.0.0-20260512221530-9dbe87dd8cfe
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
