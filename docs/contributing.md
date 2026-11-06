@@ -18,10 +18,7 @@ Thanks for your interest in contributing.
 
 ### Adding a new MCP tool
 
-1. Implement the handler in `internal/tools/<resource>.go`.
-2. Register the tool in `cmd/mlb-mcp/main.go`.
-3. Add tests in `internal/tools/<resource>_test.go` — 100% coverage required.
-4. Update the `## Tools` table in `README.md`.
+Follow [Adding a new tool](development.md#adding-a-new-tool) in development.md.
 
 ### Documentation
 
