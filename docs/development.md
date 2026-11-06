@@ -61,8 +61,22 @@ There are two kinds of tools. Pick the right workflow:
 ### Adding a composed tool (hand-written, intent-focused)
 
 A composed tool answers a **user intent** in one call — not a bare SDK method.
-See `AGENTS.md § Tool design` for the design rules. Each tool calls 1–3 SDK
-methods internally and returns a complete answer.
+Questions like "who won today", "show me Ohtani's stats" or "what are the
+standings" should each take one call. The design rules:
+
+- **One tool = one user intent.** If the user has to call two tools to get an
+  answer, merge them into one tool that does both calls.
+- **10–20 tools max.** LLMs pick the right tool faster with fewer choices.
+  Prefer fewer, richer tools over many thin ones.
+- **Tools call 1–3 SDK methods internally.** The composition logic (filter
+  today's games, enrich with scores, and so on) lives in the handler, not in the
+  LLM's reasoning.
+- **Return complete answers.** Format results so the LLM can relay them
+  directly. Do not return raw IDs that need a follow-up lookup.
+- **Name tools as user intents.** `scores` not `get_schedule`. `player_bio` not
+  `get_person`. The name tells the LLM when to pick it.
+
+To add one:
 
 1. **`internal/mcp/session.go`** — if the tool needs an SDK method not yet on
    the `Driver` interface, add it. The concrete `*mlb.Client` must already
